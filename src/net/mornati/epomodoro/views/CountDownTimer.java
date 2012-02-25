@@ -8,22 +8,20 @@ import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.util.PomodoroTimer;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
 public class CountDownTimer extends ViewPart {
 
-	final long THIRTY_MINUTES=10 * 1000;// 1800000;
-	private long time=THIRTY_MINUTES;
+	final long TOTAL_TIME=25*60*1000;
+	private long time=TOTAL_TIME;
 
 	final java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("mm : ss");
 
@@ -39,7 +37,7 @@ public class CountDownTimer extends ViewPart {
 		final Label countdown=new Label(container, SWT.NULL);
 		countdown.setText(sdf.format(time));
 		Button startButton=new Button(container, SWT.NULL);
-		final PomodoroTimer timer=new PomodoroTimer(THIRTY_MINUTES);
+		final PomodoroTimer timer=new PomodoroTimer(TOTAL_TIME);
 		scheduleTimer(countdown, 1000, timer);
 		startButton.setText("Start");
 		startButton.addSelectionListener(new SelectionListener() {

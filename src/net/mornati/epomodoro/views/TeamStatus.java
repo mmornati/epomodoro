@@ -17,13 +17,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerSorter;
@@ -50,9 +45,7 @@ public class TeamStatus extends ViewPart {
 	public static final String ID="epomodoro.views.SampleView";
 
 	private TableViewer viewer;
-	private Action action1;
-	private Action action2;
-	private Action doubleClickAction;
+	private Action sendMessage;
 
 	// This will create the columns for the table
 	private void createColumns(final Composite parent, final TableViewer viewer) {
@@ -170,7 +163,6 @@ public class TeamStatus extends ViewPart {
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "epomodoro.viewer");
 		makeActions();
 		hookContextMenu();
-		hookDoubleClickAction();
 		contributeToActionBars();
 	}
 
@@ -194,25 +186,21 @@ public class TeamStatus extends ViewPart {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(action1);
-		manager.add(new Separator());
-		manager.add(action2);
+		manager.add(sendMessage);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
-		manager.add(action1);
-		manager.add(action2);
+		manager.add(sendMessage);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(action1);
-		manager.add(action2);
+		manager.add(sendMessage);
 	}
 
 	private void makeActions() {
-		action1=new Action() {
+		sendMessage=new Action() {
 			public void run() {
 				try {
 					TimerMessage message=new TimerMessage();
@@ -226,37 +214,10 @@ public class TeamStatus extends ViewPart {
 				}
 			}
 		};
-		action1.setText("Action 1");
-		action1.setToolTipText("Action 1 tooltip");
-		action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		sendMessage.setText("Send Message");
+		sendMessage.setToolTipText("Send Message to user");
+		sendMessage.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 
-		action2=new Action() {
-			public void run() {
-				showMessage("Action 2 executed");
-			}
-		};
-		action2.setText("Action 2");
-		action2.setToolTipText("Action 2 tooltip");
-		action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		doubleClickAction=new Action() {
-			public void run() {
-				ISelection selection=viewer.getSelection();
-				Object obj=((IStructuredSelection) selection).getFirstElement();
-				showMessage("Double-click detected on " + obj.toString());
-			}
-		};
-	}
-
-	private void hookDoubleClickAction() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				doubleClickAction.run();
-			}
-		});
-	}
-
-	private void showMessage(String message) {
-		MessageDialog.openInformation(viewer.getControl().getShell(), "Sample View", message);
 	}
 
 	/**

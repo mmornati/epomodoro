@@ -3,6 +3,7 @@ package net.mornati.epomodoro;
 import java.util.logging.Logger;
 
 import net.mornati.epomodoro.communication.Communication;
+import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.ConflictRule;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -10,6 +11,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -83,9 +85,11 @@ public class Activator extends AbstractUIPlugin {
 		Job job=new Job("ConnectToJGroups") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
+				IPreferenceStore preferenceStore=getPreferenceStore();
+				String groupName=preferenceStore.getString(PomodoroPreferencePage.GROUP_NAME);
 				communication=Communication.getInstance();
 				try {
-					communication.connect("MyGroup");
+					communication.connect(groupName);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

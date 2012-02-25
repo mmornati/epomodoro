@@ -46,6 +46,7 @@ public class TeamStatus extends ViewPart {
 
 	private TableViewer viewer;
 	private Action sendMessage;
+	private Action clearTable;
 
 	// This will create the columns for the table
 	private void createColumns(final Composite parent, final TableViewer viewer) {
@@ -110,7 +111,7 @@ public class TeamStatus extends ViewPart {
 		viewer.setSorter(new NameSorter());
 		viewer.setInput(getViewSite());
 		// Make lines and make header visible
-		final Table table = viewer.getTable();
+		final Table table=viewer.getTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		Job job=new Job("AddReceiver") {
@@ -131,7 +132,9 @@ public class TeamStatus extends ViewPart {
 								if (msg != null && (msg.getObject() instanceof AbstractPomodoroMessage)) {
 									if (msg.getObject() instanceof TimerMessage) {
 										TimerMessage tm=(TimerMessage) msg.getObject();
-										tm.setSender(msg.getSrc().toString());
+										// if (tm.getSender() == null || tm.getSender().equals("")) {
+										// tm.setSender(msg.getSrc().toString());
+										// }
 										viewer.remove(tm);
 										viewer.add(tm);
 									}
@@ -187,16 +190,17 @@ public class TeamStatus extends ViewPart {
 
 	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(sendMessage);
+		manager.add(clearTable);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(sendMessage);
-		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(sendMessage);
+//		manager.add(sendMessage);
+		manager.add(clearTable);
 	}
 
 	private void makeActions() {
@@ -216,7 +220,16 @@ public class TeamStatus extends ViewPart {
 		};
 		sendMessage.setText("Send Message");
 		sendMessage.setToolTipText("Send Message to user");
-		sendMessage.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		sendMessage.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_FORWARD));
+
+		clearTable=new Action() {
+			public void run() {
+				viewer.setInput(null);
+			}
+		};
+		clearTable.setText("Clear Table");
+		clearTable.setToolTipText("Clear Table Content");
+		clearTable.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_REMOVE));
 
 	}
 

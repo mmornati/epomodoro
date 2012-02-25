@@ -1,13 +1,17 @@
 package net.mornati.epomodoro.views;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.communication.TimerMessage;
+import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.PomodoroTimer;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -20,10 +24,17 @@ import org.eclipse.ui.part.ViewPart;
 
 public class CountDownTimer extends ViewPart {
 
-	final long TOTAL_TIME=25*60*1000;
-	private long time=TOTAL_TIME;
+	final long TOTAL_TIME;
+	private long time;
 
 	final java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("mm : ss");
+
+	public CountDownTimer() {
+		IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
+		int preferenceTime=preferenceStore.getInt(PomodoroPreferencePage.POMODORO_TIME);
+		TOTAL_TIME=preferenceTime * 60 * 1000;
+		time=TOTAL_TIME;
+	}
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -92,6 +103,16 @@ public class CountDownTimer extends ViewPart {
 					message.setCreated(new Date());
 					message.setTimer(timer.getFormatTime());
 					message.setStatus(timer.getStatus());
+					IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
+					String sender=preferenceStore.getString(PomodoroPreferencePage.CLIENT_NAME);
+					if (sender == null || sender.equals("")) {
+						try {
+							sender=InetAddress.getLocalHost().getHostName();
+						} catch (UnknownHostException e) {
+							e.printStackTrace();
+						}
+					}
+					message.setSender(sender);
 					try {
 						Activator.getDefault().getCommunication().sendMessage(message);
 					} catch (Exception e) {

@@ -43,5 +43,19 @@
             file="contexts.xml">
       </contexts>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="net.mornati.epomodoro.preference.PomodoroPreferencePage"
+            id="epomodoro.Preferences"
+            name="Pomodoro Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.mornati.epomodoro.preference.PomodoroPreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>

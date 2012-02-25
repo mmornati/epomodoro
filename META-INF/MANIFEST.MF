@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Epomodoro
+Bundle-SymbolicName: epomodoro; singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: net.mornati.epomodoro.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: .,
+ lib/jgroups-3.1.0.Alpha2.jar

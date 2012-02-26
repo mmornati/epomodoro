@@ -54,7 +54,7 @@ public class CountDownTimer extends ViewPart {
 		final Label typeLabel=new Label(container, SWT.NULL);
 		typeLabel.setText("Type");
 		final Button startButton=new Button(container, SWT.NULL);
-		scheduleTimer(countdown, typeLabel, 1000);
+		scheduleTimer(startButton, countdown, typeLabel, 1000);
 		startButton.setText("Start");
 		startButton.addSelectionListener(new SelectionListener() {
 
@@ -66,7 +66,6 @@ public class CountDownTimer extends ViewPart {
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -83,18 +82,31 @@ public class CountDownTimer extends ViewPart {
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
 
 			}
 		});
 		final Button resetButton=new Button(container, SWT.NULL);
 		resetButton.setText("Reset");
-		checkTimerStatus(Activator.getDefault().getTimer());
+		resetButton.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Activator.getDefault().resetTimer(TOTAL_TIME, PomodoroTimer.TYPE_WORK);
+				startButton.setEnabled(true);
+				pauseButton.setText("Pause");
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+
+			}
+		});
+		checkTimerStatus();
 		sendTimerMessage(Activator.getDefault().getTimer());
 
 	}
 
-	private void scheduleTimer(final Label timerLabel, final Label typeLabel, final int changeInterval) {
+	private void scheduleTimer(final Button startButton, final Label timerLabel, final Label typeLabel, final int changeInterval) {
 		final PomodoroTimer internalTimer;
 		if (Activator.getDefault().getTimer() == null) {
 			internalTimer=Activator.getDefault().createTimer(TOTAL_TIME, PomodoroTimer.TYPE_WORK);
@@ -104,6 +116,9 @@ public class CountDownTimer extends ViewPart {
 		Display.getDefault().timerExec(changeInterval, new Runnable() {
 			public void run() {
 				if (internalTimer != null) {
+					if (internalTimer.getStatus().equals(PomodoroTimer.STATUS_INITIALIZED)) {
+						startButton.setEnabled(true);
+					}
 					timerLabel.setText(internalTimer.getFormatTime());
 					typeLabel.setText(internalTimer.getType() == PomodoroTimer.TYPE_WORK ? "W.T." : "P.T.");
 					if (Activator.getDefault().isShowDialog()) {
@@ -111,22 +126,26 @@ public class CountDownTimer extends ViewPart {
 						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Pomodoro Timer Finished", message);
 						Activator.getDefault().setShowDialog(false);
 					}
-					scheduleTimer(timerLabel, typeLabel, changeInterval);
+					scheduleTimer(startButton, timerLabel, typeLabel, changeInterval);
 				} else {
 					timerLabel.setText(sdf.format(new Date(TOTAL_TIME)));
-					scheduleTimer(timerLabel, typeLabel, changeInterval);
+					scheduleTimer(startButton, timerLabel, typeLabel, changeInterval);
 				}
 
 			}
 		});
 	}
 
-	private void checkTimerStatus(final PomodoroTimer timer) {
+	private void checkTimerStatus() {
 		final Timer scheduler=new Timer();
 		TimerTask task=new TimerTask() {
 			@Override
 			public void run() {
+				PomodoroTimer timer=Activator.getDefault().getTimer();
 				PomodoroTimer newTimer;
+				if (timer == null || timer.isInterrupted()) {
+					return;
+				}
 				if (timer.getStatus().equals(PomodoroTimer.STATUS_FINISHED)) {
 					Activator.getDefault().setShowDialog(true);
 					while (Activator.getDefault().isShowDialog()) {
@@ -140,12 +159,12 @@ public class CountDownTimer extends ViewPart {
 					if (timer != null && timer.getType() == PomodoroTimer.TYPE_WORK) {
 						int pauseTimer=preferenceStore.getInt(PomodoroPreferencePage.POMODORO_PAUSE) * 60 * 1000;
 						newTimer=Activator.getDefault().createTimer(pauseTimer, PomodoroTimer.TYPE_PAUSE);
+						if (preferenceStore.getBoolean(PomodoroPreferencePage.WORK_PAUSE_AUTO_SWITCH)) {
+							newTimer.start();
+						}
 					} else {
 						TOTAL_TIME=preferenceStore.getInt(PomodoroPreferencePage.POMODORO_TIME) * 60 * 1000;
 						newTimer=Activator.getDefault().createTimer(TOTAL_TIME, PomodoroTimer.TYPE_WORK);
-					}
-					if (preferenceStore.getBoolean(PomodoroPreferencePage.WORK_PAUSE_AUTO_SWITCH)) {
-						newTimer.start();
 					}
 				}
 
@@ -191,7 +210,6 @@ public class CountDownTimer extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
 
 	}
 

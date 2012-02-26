@@ -12,7 +12,7 @@
             allowMultiple="false"
             category="epomodoro"
             class="net.mornati.epomodoro.views.TeamStatus"
-            icon="icons/sample.gif"
+            icon="icons/team.png"
             id="epomodoro.views.TeamStatus"
             name="Team Messages">
       </view>
@@ -20,6 +20,7 @@
             allowMultiple="false"
             category="epomodoro"
             class="net.mornati.epomodoro.views.CountDownTimer"
+            icon="icons/pomodoro.png"
             id="epomodoro.views.CountDownTimer"
             name="CountDown Timer"
             restorable="true">

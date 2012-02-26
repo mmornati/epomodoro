@@ -9,6 +9,7 @@ public class PomodoroTimer extends Thread {
 	private static final SimpleDateFormat formatter=new SimpleDateFormat("mm : ss");
 	private boolean paused=false;
 	private boolean started=false;
+	private boolean interrupted=false;
 	public static final String STATUS_WORKING_TIME="Working time";
 	public static final String STATUS_PAUSING_TIME="Pausing time";
 	public static final String STATUS_PAUSED="Paused";
@@ -27,7 +28,7 @@ public class PomodoroTimer extends Thread {
 
 	public void run() {
 		started=true;
-		while (currentTime > 0) {
+		while (currentTime > 0 && !interrupted) {
 			if (!paused) {
 				currentTime=currentTime - 1000;
 			}
@@ -37,11 +38,15 @@ public class PomodoroTimer extends Thread {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	public void pause() {
 		paused=!paused;
+	}
+
+	@Override
+	public void interrupt() {
+		interrupted=true;
 	}
 
 	public String getFormatTime() {

@@ -61,6 +61,8 @@ public class Activator extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		plugin=null;
 		super.stop(context);
+		timer.interrupt();
+		timer=null;
 		communication.close();
 	}
 
@@ -123,6 +125,14 @@ public class Activator extends AbstractUIPlugin {
 
 	public PomodoroTimer createTimer(long totalTime, int type) {
 		if (timer == null || timer.getTime() == 0) {
+			timer=new PomodoroTimer(totalTime, type);
+		}
+		return timer;
+	}
+	
+	public PomodoroTimer resetTimer(long totalTime, int type) {
+		if (timer != null) {
+			timer.interrupt();
 			timer=new PomodoroTimer(totalTime, type);
 		}
 		return timer;

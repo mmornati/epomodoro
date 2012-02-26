@@ -5,12 +5,15 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.PomodoroTimer;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -24,7 +27,8 @@ import org.eclipse.ui.part.ViewPart;
 
 public class CountDownTimer extends ViewPart {
 
-	final long TOTAL_TIME;
+	private static final Logger LOG=Logger.getLogger(CountDownTimer.class.getName());
+	long TOTAL_TIME;
 	private long time;
 
 	final java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("mm : ss");
@@ -41,21 +45,23 @@ public class CountDownTimer extends ViewPart {
 		Composite container=new Composite(parent, SWT.NULL);
 		GridLayout layout=new GridLayout();
 		container.setLayout(layout);
-		layout.numColumns=2;
+		layout.numColumns=3;
 		layout.verticalSpacing=9;
 		Label label=new Label(container, SWT.NULL);
 		label.setText("Timer:");
 		final Label countdown=new Label(container, SWT.NULL);
 		countdown.setText(sdf.format(time));
-		Button startButton=new Button(container, SWT.NULL);
-		final PomodoroTimer timer=new PomodoroTimer(TOTAL_TIME);
-		scheduleTimer(countdown, 1000, timer);
+		final Label typeLabel=new Label(container, SWT.NULL);
+		typeLabel.setText("Type");
+		final Button startButton=new Button(container, SWT.NULL);
+		scheduleTimer(countdown, typeLabel, 1000);
 		startButton.setText("Start");
 		startButton.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				timer.start();
+				Activator.getDefault().getTimer().start();
+				startButton.setEnabled(false);
 			}
 
 			@Override
@@ -64,13 +70,15 @@ public class CountDownTimer extends ViewPart {
 
 			}
 		});
-		Button pauseButton=new Button(container, SWT.NULL);
+		final Button pauseButton=new Button(container, SWT.NULL);
 		pauseButton.setText("Pause");
 		pauseButton.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				timer.pause();
+				Activator.getDefault().getTimer().pause();
+				String buttonText=Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_PAUSED) ? "Restart" : "Pause";
+				pauseButton.setText(buttonText);
 			}
 
 			@Override
@@ -79,17 +87,72 @@ public class CountDownTimer extends ViewPart {
 
 			}
 		});
-		sendTimerMessage(timer);
+		final Button resetButton=new Button(container, SWT.NULL);
+		resetButton.setText("Reset");
+		checkTimerStatus(Activator.getDefault().getTimer());
+		sendTimerMessage(Activator.getDefault().getTimer());
 
 	}
 
-	private void scheduleTimer(final Label label, final int changeInterval, final PomodoroTimer timer) {
+	private void scheduleTimer(final Label timerLabel, final Label typeLabel, final int changeInterval) {
+		final PomodoroTimer internalTimer;
+		if (Activator.getDefault().getTimer() == null) {
+			internalTimer=Activator.getDefault().createTimer(TOTAL_TIME, PomodoroTimer.TYPE_WORK);
+		} else {
+			internalTimer=Activator.getDefault().getTimer();
+		}
 		Display.getDefault().timerExec(changeInterval, new Runnable() {
 			public void run() {
-				label.setText(timer.getFormatTime());
-				scheduleTimer(label, changeInterval, timer);
+				if (internalTimer != null) {
+					timerLabel.setText(internalTimer.getFormatTime());
+					typeLabel.setText(internalTimer.getType() == PomodoroTimer.TYPE_WORK ? "W.T." : "P.T.");
+					if (Activator.getDefault().isShowDialog()) {
+						String message=(Activator.getDefault().getTimer().getType() == PomodoroTimer.TYPE_WORK ? "Working " : "Pausing ") + "Time finished";
+						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Pomodoro Timer Finished", message);
+						Activator.getDefault().setShowDialog(false);
+					}
+					scheduleTimer(timerLabel, typeLabel, changeInterval);
+				} else {
+					timerLabel.setText(sdf.format(new Date(TOTAL_TIME)));
+					scheduleTimer(timerLabel, typeLabel, changeInterval);
+				}
+
 			}
 		});
+	}
+
+	private void checkTimerStatus(final PomodoroTimer timer) {
+		final Timer scheduler=new Timer();
+		TimerTask task=new TimerTask() {
+			@Override
+			public void run() {
+				PomodoroTimer newTimer;
+				if (timer.getStatus().equals(PomodoroTimer.STATUS_FINISHED)) {
+					Activator.getDefault().setShowDialog(true);
+					while (Activator.getDefault().isShowDialog()) {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							LOG.log(Level.SEVERE, "Error sleeping Thread", e);
+						}
+					}
+					IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
+					if (timer != null && timer.getType() == PomodoroTimer.TYPE_WORK) {
+						int pauseTimer=preferenceStore.getInt(PomodoroPreferencePage.POMODORO_PAUSE) * 60 * 1000;
+						newTimer=Activator.getDefault().createTimer(pauseTimer, PomodoroTimer.TYPE_PAUSE);
+					} else {
+						TOTAL_TIME=preferenceStore.getInt(PomodoroPreferencePage.POMODORO_TIME) * 60 * 1000;
+						newTimer=Activator.getDefault().createTimer(TOTAL_TIME, PomodoroTimer.TYPE_WORK);
+					}
+					if (preferenceStore.getBoolean(PomodoroPreferencePage.WORK_PAUSE_AUTO_SWITCH)) {
+						newTimer.start();
+					}
+				}
+
+			}
+
+		};
+		scheduler.schedule(task, 1000, 1000);
 	}
 
 	private void sendTimerMessage(final PomodoroTimer timer) {
@@ -98,7 +161,7 @@ public class CountDownTimer extends ViewPart {
 
 			@Override
 			public void run() {
-				if (Activator.getDefault().getCommunication() != null && Activator.getDefault().getCommunication().isConnected()) {
+				if (Activator.getDefault().getCommunication() != null && Activator.getDefault().getCommunication().isConnected() && timer != null) {
 					TimerMessage message=new TimerMessage();
 					message.setCreated(new Date());
 					message.setTimer(timer.getFormatTime());
@@ -109,14 +172,14 @@ public class CountDownTimer extends ViewPart {
 						try {
 							sender=InetAddress.getLocalHost().getHostName();
 						} catch (UnknownHostException e) {
-							e.printStackTrace();
+							LOG.log(Level.SEVERE, "Error retrieving workstation name", e);
 						}
 					}
 					message.setSender(sender);
 					try {
 						Activator.getDefault().getCommunication().sendMessage(message);
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOG.log(Level.SEVERE, "Error sending message", e);
 					}
 				}
 

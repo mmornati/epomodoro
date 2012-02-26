@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import net.mornati.epomodoro.communication.Communication;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.ConflictRule;
+import net.mornati.epomodoro.util.PomodoroTimer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -31,6 +32,8 @@ public class Activator extends AbstractUIPlugin {
 
 	private Communication communication;
 	private ISchedulingRule jobRule;
+	private PomodoroTimer timer;
+	private boolean showDialog=false;
 
 	/**
 	 * The constructor
@@ -112,6 +115,25 @@ public class Activator extends AbstractUIPlugin {
 			jobRule=new ConflictRule();
 		}
 		return jobRule;
+	}
+
+	public PomodoroTimer getTimer() {
+		return timer;
+	}
+
+	public PomodoroTimer createTimer(long totalTime, int type) {
+		if (timer == null || timer.getTime() == 0) {
+			timer=new PomodoroTimer(totalTime, type);
+		}
+		return timer;
+	}
+
+	public void setShowDialog(boolean showDialog) {
+		this.showDialog=showDialog;
+	}
+
+	public boolean isShowDialog() {
+		return showDialog;
 	}
 
 }

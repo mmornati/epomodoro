@@ -9,9 +9,20 @@ public class PomodoroTimer extends Thread {
 	private static final SimpleDateFormat formatter=new SimpleDateFormat("mm : ss");
 	private boolean paused=false;
 	private boolean started=false;
+	public static final String STATUS_WORKING_TIME="Working time";
+	public static final String STATUS_PAUSING_TIME="Pausing time";
+	public static final String STATUS_PAUSED="Paused";
+	public static final String STATUS_FINISHED="Finished";
+	public static final String STATUS_INITIALIZED="Initilized";
 
-	public PomodoroTimer(long time) {
+	public static final int TYPE_WORK=0;
+	public static final int TYPE_PAUSE=1;
+	private int type=TYPE_WORK;
+
+	public PomodoroTimer(long time, int type) {
 		this.currentTime=time;
+		this.type=type;
+		started=false;
 	}
 
 	public void run() {
@@ -26,6 +37,7 @@ public class PomodoroTimer extends Thread {
 				e.printStackTrace();
 			}
 		}
+
 	}
 
 	public void pause() {
@@ -40,15 +52,23 @@ public class PomodoroTimer extends Thread {
 		return currentTime;
 	}
 
+	public int getType() {
+		return type;
+	}
+
 	public String getStatus() {
 		if (!started) {
-			return "Initialized";
+			return STATUS_INITIALIZED;
 		} else if (currentTime > 0 && !paused) {
-			return "Running";
+			if (type == TYPE_WORK) {
+				return STATUS_WORKING_TIME;
+			} else {
+				return STATUS_PAUSING_TIME;
+			}
 		} else if (currentTime > 0 && paused) {
-			return "Paused";
+			return STATUS_PAUSED;
 		} else {
-			return "Finished";
+			return STATUS_FINISHED;
 		}
 	}
 

@@ -44,6 +44,9 @@ public class Communication {
 	}
 
 	public boolean isConnected() {
+		if (channel == null) {
+			return false;
+		}
 		return channel.isConnected();
 	}
 

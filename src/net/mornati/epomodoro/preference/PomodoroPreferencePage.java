@@ -16,6 +16,7 @@ public class PomodoroPreferencePage extends FieldEditorPreferencePage implements
 	public static final String POMODORO_TIME="POMODORO_TIME";
 	public static final String POMODORO_PAUSE="POMODORO_PAUSE";
 	public static final String WORK_PAUSE_AUTO_SWITCH="WORK_PAUSE_AUTO_SWITCH";
+	public static final String DISCARD_OWN_MESSAGE="DISCARD_OWN_MESSAGE";
 
 	public PomodoroPreferencePage() {
 		super(GRID);
@@ -28,6 +29,7 @@ public class PomodoroPreferencePage extends FieldEditorPreferencePage implements
 		addField(new IntegerFieldEditor(POMODORO_TIME, "Pomodoro Time (minutes):", getFieldEditorParent()));
 		addField(new IntegerFieldEditor(POMODORO_PAUSE, "Pomodoro Pause (minutes):", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(WORK_PAUSE_AUTO_SWITCH, "Auto start pause:", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(DISCARD_OWN_MESSAGE, "Discard own message in team table:", getFieldEditorParent()));
 
 	}
 

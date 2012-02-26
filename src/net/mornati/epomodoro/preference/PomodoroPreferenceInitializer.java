@@ -12,11 +12,13 @@ public class PomodoroPreferenceInitializer extends AbstractPreferenceInitializer
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		store.setDefault("GROUP_NAME", "MyTeam");
-		store.setDefault("CLIENT_NAME", "");
-		store.setDefault("POMODORO_TIME", "25");
-		store.setDefault("POMODORO_PAUSE", "5");
+		IPreferenceStore store=Activator.getDefault().getPreferenceStore();
+		store.setDefault(PomodoroPreferencePage.GROUP_NAME, "MyTeam");
+		store.setDefault(PomodoroPreferencePage.CLIENT_NAME, "");
+		store.setDefault(PomodoroPreferencePage.POMODORO_TIME, "25");
+		store.setDefault(PomodoroPreferencePage.POMODORO_PAUSE, "5");
+		store.setDefault(PomodoroPreferencePage.WORK_PAUSE_AUTO_SWITCH, true);
+		store.setDefault(PomodoroPreferencePage.DISCARD_OWN_MESSAGE, false);
 	}
 
 }

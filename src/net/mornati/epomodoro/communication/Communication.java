@@ -24,11 +24,11 @@ public class Communication {
 		return communication;
 	}
 
-	public void connect(final String groupName) throws Exception {
+	public void connect(final String groupName, boolean discardOwnMessage) throws Exception {
 		URL url=Activator.getDefault().getBundle().getResource("resources/udp.xml");
 		channel=new JChannel(url.openStream());
 		channel.connect(groupName);
-		// channel.setDiscardOwnMessages(true);
+		channel.setDiscardOwnMessages(discardOwnMessage);
 	}
 
 	public void sendMessage(AbstractPomodoroMessage message) throws Exception {

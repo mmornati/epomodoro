@@ -1,7 +1,5 @@
 package net.mornati.epomodoro;
 
-import java.util.logging.Logger;
-
 import net.mornati.epomodoro.communication.Communication;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.ConflictRule;
@@ -21,8 +19,6 @@ import org.osgi.framework.BundleContext;
  * The activator class controls the plug-in life cycle
  */
 public class Activator extends AbstractUIPlugin {
-
-	private static Logger LOG=Logger.getLogger("Activator");
 
 	// The plug-in ID
 	public static final String PLUGIN_ID="epomodoro"; //$NON-NLS-1$
@@ -92,9 +88,10 @@ public class Activator extends AbstractUIPlugin {
 			protected IStatus run(IProgressMonitor monitor) {
 				IPreferenceStore preferenceStore=getPreferenceStore();
 				String groupName=preferenceStore.getString(PomodoroPreferencePage.GROUP_NAME);
+				boolean discardOwnMessage=preferenceStore.getBoolean(PomodoroPreferencePage.DISCARD_OWN_MESSAGE);
 				communication=Communication.getInstance();
 				try {
-					communication.connect(groupName);
+					communication.connect(groupName, discardOwnMessage);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -129,7 +126,7 @@ public class Activator extends AbstractUIPlugin {
 		}
 		return timer;
 	}
-	
+
 	public PomodoroTimer resetTimer(long totalTime, int type) {
 		if (timer != null) {
 			timer.interrupt();

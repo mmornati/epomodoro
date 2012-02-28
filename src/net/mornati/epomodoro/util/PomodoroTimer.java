@@ -3,6 +3,11 @@ package net.mornati.epomodoro.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import net.mornati.epomodoro.Activator;
+import net.mornati.epomodoro.preference.PomodoroPreferencePage;
+
+import org.eclipse.jface.preference.IPreferenceStore;
+
 public class PomodoroTimer extends Thread {
 
 	private long currentTime;
@@ -75,6 +80,12 @@ public class PomodoroTimer extends Thread {
 		} else {
 			return STATUS_FINISHED;
 		}
+	}
+	
+	public int getConfigWorkTime() {
+		IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
+		int preferenceTime=preferenceStore.getInt(PomodoroPreferencePage.POMODORO_TIME);
+		return preferenceTime * 60 * 1000;
 	}
 
 }

@@ -191,7 +191,9 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 						}
 						Display.getDefault().asyncExec(new Runnable() {
 							public void run() {
-								viewer.refresh();
+								if (!viewer.getTable().isDisposed()) {
+									viewer.refresh();
+								}
 							}
 						});
 					}

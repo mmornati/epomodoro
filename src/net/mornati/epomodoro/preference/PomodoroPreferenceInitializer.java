@@ -19,6 +19,7 @@ public class PomodoroPreferenceInitializer extends AbstractPreferenceInitializer
 		store.setDefault(PomodoroPreferencePage.POMODORO_PAUSE, "5");
 		store.setDefault(PomodoroPreferencePage.WORK_PAUSE_AUTO_SWITCH, true);
 		store.setDefault(PomodoroPreferencePage.DISCARD_OWN_MESSAGE, false);
+		store.setDefault(PomodoroPreferencePage.SHOW_TIMER_STATUS_BAR, true);
 	}
 
 }

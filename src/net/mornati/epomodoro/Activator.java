@@ -1,7 +1,12 @@
 package net.mornati.epomodoro;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.mornati.epomodoro.communication.Communication;
 import net.mornati.epomodoro.communication.TimerMessage;
@@ -14,8 +19,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -34,7 +43,12 @@ public class Activator extends AbstractUIPlugin {
 	private ISchedulingRule jobRule;
 	private PomodoroTimer timer;
 	private boolean showDialog=false;
-	private Timer scheduler=new Timer();;
+	private Timer scheduler=new Timer();
+	final java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("mm : ss");
+	private static final Logger LOG=Logger.getLogger(Activator.class.getName());
+	private List<Button> startButtons=new ArrayList<Button>();
+	private List<Label> counterLabels=new ArrayList<Label>();
+	private List<Button> pauseButtons=new ArrayList<Button>();
 
 	/*
 	 * (non-Javadoc)
@@ -175,4 +189,99 @@ public class Activator extends AbstractUIPlugin {
 		return scheduler;
 	}
 
+	public void subscribeStartButton(Button button) {
+		startButtons.add(button);
+	}
+
+	public void subscribeCounterLabel(Label label) {
+		counterLabels.add(label);
+	}
+
+	public void subscribePauseButton(Button button) {
+		pauseButtons.add(button);
+	}
+
+	public List<Button> getStartButtons() {
+		return startButtons;
+	}
+
+	public List<Button> getPauseButtons() {
+		return pauseButtons;
+	}
+
+	public void scheduleTimer(final int changeInterval) {
+		final PomodoroTimer internalTimer;
+		if (timer == null) {
+			internalTimer=createTimer(timer.getConfigWorkTime(), PomodoroTimer.TYPE_WORK);
+		} else {
+			internalTimer=timer;
+		}
+		Display.getDefault().timerExec(changeInterval, new Runnable() {
+			public void run() {
+				if (internalTimer != null) {
+					if (internalTimer.getStatus().equals(PomodoroTimer.STATUS_INITIALIZED)) {
+						for (Button startButton : startButtons) {
+							if (!startButton.isDisposed()) {
+								startButton.setEnabled(true);
+							}
+						}
+					}
+					for (Label countdown : counterLabels) {
+						if (!countdown.isDisposed()) {
+							countdown.setText(internalTimer.getFormatTime());
+						}
+					}
+					if (Activator.getDefault().isShowDialog()) {
+						String message=(timer.getType() == PomodoroTimer.TYPE_WORK ? "Working " : "Pausing ") + "Time finished";
+						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Pomodoro Timer Finished", message);
+						setShowDialog(false);
+					}
+					scheduleTimer(changeInterval);
+				} else {
+					for (Label countdown : counterLabels) {
+						if (!countdown.isDisposed()) {
+							countdown.setText(sdf.format(new Date(timer.getConfigWorkTime())));
+						}
+					}
+					scheduleTimer(changeInterval);
+				}
+
+			}
+		});
+	}
+
+	public void checkTimerStatus() {
+		TimerTask task=new TimerTask() {
+			@Override
+			public void run() {
+				PomodoroTimer newTimer;
+				if (timer == null || timer.isInterrupted()) {
+					return;
+				}
+				if (timer.getStatus().equals(PomodoroTimer.STATUS_FINISHED)) {
+					setShowDialog(true);
+					while (isShowDialog()) {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							LOG.log(Level.SEVERE, "Error sleeping Thread", e);
+						}
+					}
+					IPreferenceStore preferenceStore=getPreferenceStore();
+					if (timer != null && timer.getType() == PomodoroTimer.TYPE_WORK) {
+						int pauseTimer=preferenceStore.getInt(PomodoroPreferencePage.POMODORO_PAUSE) * 60 * 1000;
+						newTimer=createTimer(pauseTimer, PomodoroTimer.TYPE_PAUSE);
+						if (preferenceStore.getBoolean(PomodoroPreferencePage.WORK_PAUSE_AUTO_SWITCH)) {
+							newTimer.start();
+						}
+					} else {
+						newTimer=createTimer(timer.getConfigWorkTime(), PomodoroTimer.TYPE_WORK);
+					}
+				}
+
+			}
+
+		};
+		scheduler.schedule(task, 1000, 1000);
+	}
 }

@@ -3,7 +3,9 @@ package net.mornati.epomodoro.communication;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
@@ -18,6 +20,7 @@ public class Communication {
 
 	private static Communication communication;
 	private JChannel channel;
+	private List<TextMessage> receivedTextMessages=new ArrayList<TextMessage>();
 
 	private Communication() {
 
@@ -58,6 +61,18 @@ public class Communication {
 			return false;
 		}
 		return channel.isConnected();
+	}
+
+	public List<TextMessage> getReceivedMessages() {
+		return receivedTextMessages;
+	}
+
+	public void resetReceivedMessages() {
+		receivedTextMessages.clear();
+	}
+
+	public void addReceivedMessage(TextMessage message) {
+		receivedTextMessages.add(message);
 	}
 
 	public static AbstractPomodoroMessage createMessage(Class<?> toCreate) {

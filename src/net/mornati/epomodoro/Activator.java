@@ -13,6 +13,7 @@ import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.ConflictRule;
 import net.mornati.epomodoro.util.PomodoroTimer;
+import net.mornati.epomodoro.util.UIUtil;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -267,6 +268,7 @@ public class Activator extends AbstractUIPlugin {
 							LOG.log(Level.SEVERE, "Error sleeping Thread", e);
 						}
 					}
+					UIUtil.showReceivedMessages();
 					IPreferenceStore preferenceStore=getPreferenceStore();
 					if (timer != null && timer.getType() == PomodoroTimer.TYPE_WORK) {
 						int pauseTimer=preferenceStore.getInt(PomodoroPreferencePage.POMODORO_PAUSE) * 60 * 1000;

@@ -3,12 +3,15 @@ package net.mornati.epomodoro.util;
 import java.util.List;
 
 import net.mornati.epomodoro.Activator;
+import net.mornati.epomodoro.communication.TextMessage;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 public class UIUtil {
 
@@ -100,6 +103,21 @@ public class UIUtil {
 		});
 		return resetButton;
 
+	}
+
+	public static void showReceivedMessages() {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				if (Activator.getDefault().getCommunication().getReceivedMessages().size() > 0) {
+					String messages="";
+					for (TextMessage textMessage : Activator.getDefault().getCommunication().getReceivedMessages()) {
+						messages+=textMessage.getSender() + " - " + textMessage.getMessage() + "\n";
+					}
+					MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Messages Received", messages);
+					Activator.getDefault().getCommunication().resetReceivedMessages();
+				}
+			}
+		});
 	}
 
 }

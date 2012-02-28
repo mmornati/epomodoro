@@ -15,6 +15,8 @@ import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.PluginImages;
 import net.mornati.epomodoro.util.PomodoroComparator;
+import net.mornati.epomodoro.util.PomodoroTimer;
+import net.mornati.epomodoro.util.UIUtil;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -179,12 +181,11 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 								}
 								receivedMessages.add(tm);
 							} else if (msg.getObject() instanceof TextMessage) {
-								final TextMessage textMessage=(TextMessage) msg.getObject();
-								Display.getDefault().asyncExec(new Runnable() {
-									public void run() {
-										MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Text Received", textMessage.getMessage());
-									}
-								});
+								Activator.getDefault().getCommunication().addReceivedMessage((TextMessage) msg.getObject());
+								if (!Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_WORKING_TIME)) {
+									UIUtil.showReceivedMessages();
+								}
+
 							}
 						} else {
 							LOG.log(Level.WARNING, "Received a wrong message");

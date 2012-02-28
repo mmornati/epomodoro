@@ -2,26 +2,30 @@ package net.mornati.epomodoro.views;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.communication.AbstractPomodoroMessage;
 import net.mornati.epomodoro.communication.Communication;
+import net.mornati.epomodoro.communication.TextMessage;
 import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.PluginImages;
+import net.mornati.epomodoro.util.PomodoroComparator;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -29,16 +33,15 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 import org.jgroups.Message;
@@ -56,6 +59,8 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 	private TableViewer viewer;
 	private Action clearTable;
 	private Action connect;
+	private PomodoroComparator comparator;
+	private List<TimerMessage> receivedMessages=new ArrayList<TimerMessage>();
 
 	// This will create the columns for the table
 	private void createColumns(final Composite parent, final TableViewer viewer) {
@@ -107,7 +112,22 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 		column.setWidth(bound);
 		column.setResizable(true);
 		column.setMoveable(true);
+		column.addSelectionListener(getSelectionAdapter(column, colNumber));
 		return viewerColumn;
+	}
+
+	private SelectionAdapter getSelectionAdapter(final TableColumn column, final int index) {
+		SelectionAdapter selectionAdapter=new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				comparator.setColumn(index);
+				int dir=comparator.getDirection();
+				viewer.getTable().setSortDirection(dir);
+				viewer.getTable().setSortColumn(column);
+				viewer.refresh();
+			}
+		};
+		return selectionAdapter;
 	}
 
 	class NameSorter extends ViewerSorter {
@@ -132,7 +152,9 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 		createColumns(composite, viewer);
 		viewer.setContentProvider(new ArrayContentProvider());
 		viewer.setSorter(new NameSorter());
-		viewer.setInput(getViewSite());
+		viewer.setInput(receivedMessages);
+		comparator=new PomodoroComparator();
+		viewer.setComparator(comparator);
 		// Make lines and make header visible
 		final Table table=viewer.getTable();
 		table.setHeaderVisible(true);
@@ -149,17 +171,27 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 				}
 				Activator.getDefault().getCommunication().setReceiver(new ReceiverAdapter() {
 					public void receive(final Message msg) {
+						if (msg != null && (msg.getObject() instanceof AbstractPomodoroMessage)) {
+							if (msg.getObject() instanceof TimerMessage) {
+								TimerMessage tm=(TimerMessage) msg.getObject();
+								if (receivedMessages.contains(tm)) {
+									receivedMessages.remove(tm);
+								}
+								receivedMessages.add(tm);
+							} else if (msg.getObject() instanceof TextMessage) {
+								final TextMessage textMessage=(TextMessage) msg.getObject();
+								Display.getDefault().asyncExec(new Runnable() {
+									public void run() {
+										MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Text Received", textMessage.getMessage());
+									}
+								});
+							}
+						} else {
+							LOG.log(Level.WARNING, "Received a wrong message");
+						}
 						Display.getDefault().asyncExec(new Runnable() {
 							public void run() {
-								if (msg != null && (msg.getObject() instanceof AbstractPomodoroMessage)) {
-									if (msg.getObject() instanceof TimerMessage) {
-										TimerMessage tm=(TimerMessage) msg.getObject();
-										viewer.remove(tm);
-										viewer.add(tm);
-									}
-								} else {
-									LOG.log(Level.WARNING, "Received a wrong message");
-								}
+								viewer.refresh();
 							}
 						});
 					}

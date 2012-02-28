@@ -36,4 +36,12 @@ public class AbstractPomodoroMessage implements Serializable {
 		this.senderMachine=senderMachine;
 	}
 
+	public Address getSourceAddress() {
+		return sourceAddress;
+	}
+
+	public void setSourceAddress(Address sourceAddress) {
+		this.sourceAddress=sourceAddress;
+	}
+
 }

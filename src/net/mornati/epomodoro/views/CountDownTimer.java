@@ -103,22 +103,6 @@ public class CountDownTimer extends ViewPart {
 			}
 		});
 		checkTimerStatus();
-		// sendTimerMessage(Activator.getDefault().getTimer());
-
-		// IActionBars aBars=getViewSite().getActionBars();
-		// IToolBarManager tbMgr=aBars.getToolBarManager();
-		//
-		// IContributionItem scaleItem=new ControlContribution("type") {
-		// protected Control createControl(Composite parent) {
-		// Composite container=new Composite(parent, SWT.NULL);
-		// Label label=new Label(container, SWT.NONE);
-		// label.setText("TEST");
-		// return container;
-		// };
-		// };
-		// tbMgr.add(scaleItem);
-		// tbMgr.update(true);
-		// aBars.updateActionBars();
 		addTimerToStatus();
 	}
 
@@ -133,10 +117,16 @@ public class CountDownTimer extends ViewPart {
 			public void run() {
 				if (internalTimer != null) {
 					if (internalTimer.getStatus().equals(PomodoroTimer.STATUS_INITIALIZED)) {
-						startButton.setEnabled(true);
+						if (!startButton.isDisposed()) {
+							startButton.setEnabled(true);
+						}
 					}
-					countdown.setText(internalTimer.getFormatTime());
-					countdownStatus.setText(internalTimer.getFormatTime());
+					if (!countdown.isDisposed()) {
+						countdown.setText(internalTimer.getFormatTime());
+					}
+					if (!countdownStatus.isDisposed()) {
+						countdownStatus.setText(internalTimer.getFormatTime());
+					}
 					typeLabel.setText(internalTimer.getType() == PomodoroTimer.TYPE_WORK ? "W.T." : "P.T.");
 					if (Activator.getDefault().isShowDialog()) {
 						String message=(Activator.getDefault().getTimer().getType() == PomodoroTimer.TYPE_WORK ? "Working " : "Pausing ") + "Time finished";
@@ -145,8 +135,12 @@ public class CountDownTimer extends ViewPart {
 					}
 					scheduleTimer(startButton, typeLabel, changeInterval);
 				} else {
-					countdown.setText(sdf.format(new Date(TOTAL_TIME)));
-					countdownStatus.setText(internalTimer.getFormatTime());
+					if (!countdown.isDisposed()) {
+						countdown.setText(sdf.format(new Date(TOTAL_TIME)));
+					}
+					if (!countdownStatus.isDisposed()) {
+						countdownStatus.setText(internalTimer.getFormatTime());
+					}
 					scheduleTimer(startButton, typeLabel, changeInterval);
 				}
 

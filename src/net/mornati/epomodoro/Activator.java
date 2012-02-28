@@ -1,8 +1,5 @@
 package net.mornati.epomodoro;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -125,24 +122,9 @@ public class Activator extends AbstractUIPlugin {
 			@Override
 			public void run() {
 				if (communication != null && communication.isConnected() && timer != null) {
-					TimerMessage message=new TimerMessage();
-					message.setCreated(new Date());
+					TimerMessage message=(TimerMessage) Communication.createMessage(TimerMessage.class);
 					message.setTimer(timer.getFormatTime());
 					message.setStatus(timer.getStatus());
-					String senderMachine="";
-					try {
-						senderMachine=InetAddress.getLocalHost().getHostName();
-					} catch (UnknownHostException e) {
-						e.printStackTrace();
-					}
-					message.setSenderMachine(senderMachine);
-					IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
-					String sender=preferenceStore.getString(PomodoroPreferencePage.CLIENT_NAME);
-					if (sender != null && !sender.equals("")) {
-						message.setSender(sender);
-					} else {
-						message.setSender(senderMachine);
-					}
 					try {
 						communication.sendMessage(message);
 					} catch (Exception e) {

@@ -1,14 +1,18 @@
 package net.mornati.epomodoro.communication;
 
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.Date;
 
 import net.mornati.epomodoro.Activator;
+import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
-import org.jgroups.util.SingletonAddress;
 
 public class Communication {
 
@@ -34,7 +38,11 @@ public class Communication {
 	}
 
 	public void sendMessage(AbstractPomodoroMessage message) throws Exception {
-		channel.send(new Message(null, null, message));
+		sendMessage(message, null);
+	}
+
+	public void sendMessage(AbstractPomodoroMessage message, Address destination) throws Exception {
+		channel.send(new Message(destination, null, message));
 	}
 
 	public void close() {
@@ -50,6 +58,36 @@ public class Communication {
 			return false;
 		}
 		return channel.isConnected();
+	}
+
+	public static AbstractPomodoroMessage createMessage(Class<?> toCreate) {
+		AbstractPomodoroMessage message;
+		try {
+			message=(AbstractPomodoroMessage) toCreate.newInstance();
+		} catch (InstantiationException e1) {
+			e1.printStackTrace();
+			return null;
+		} catch (IllegalAccessException e1) {
+			e1.printStackTrace();
+			return null;
+		}
+		message.setCreated(new Date());
+		String senderMachine="";
+		try {
+			senderMachine=InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		message.setSenderMachine(senderMachine);
+		IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
+		String sender=preferenceStore.getString(PomodoroPreferencePage.CLIENT_NAME);
+		if (sender != null && !sender.equals("")) {
+			message.setSender(sender);
+		} else {
+			message.setSender(senderMachine);
+		}
+
+		return message;
 	}
 
 }

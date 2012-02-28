@@ -1,12 +1,13 @@
 package net.mornati.epomodoro.views;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.communication.AbstractPomodoroMessage;
 import net.mornati.epomodoro.communication.Communication;
-import net.mornati.epomodoro.communication.TextMessage;
 import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.PluginImages;
@@ -16,33 +17,34 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 
-public class TeamStatus extends ViewPart {
+public class TeamStatus extends ViewPart implements PropertyChangeListener {
 
 	/**
 	 * The ID of the view as specified by the extension.
@@ -52,14 +54,13 @@ public class TeamStatus extends ViewPart {
 	private static final Logger LOG=Logger.getLogger(TeamStatus.class.getName());
 
 	private TableViewer viewer;
-	private Action sendMessage;
 	private Action clearTable;
 	private Action connect;
 
 	// This will create the columns for the table
 	private void createColumns(final Composite parent, final TableViewer viewer) {
 		String[] titles= { "Machine", "Sender Name", "Pomodoro Status", "Pomodoro Timer" };
-		int[] bounds= { 100, 100, 100, 100 };
+		int[] bounds= { 150, 100, 120, 100 };
 
 		TableViewerColumn col=createTableViewerColumn(titles[0], bounds[0], 0);
 		col.setLabelProvider(new ColumnLabelProvider() {
@@ -122,12 +123,16 @@ public class TeamStatus extends ViewPart {
 	 * This is a callback that will allow us to create the viewer and initialize it.
 	 */
 	public void createPartControl(Composite parent) {
-		viewer=new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		createColumns(parent, viewer);
+		Composite composite=new Composite(parent, SWT.NONE);
+		GridLayout gridLayout=new GridLayout();
+		gridLayout.marginWidth=gridLayout.marginHeight=gridLayout.verticalSpacing=gridLayout.horizontalSpacing=gridLayout.marginLeft=gridLayout.marginTop=gridLayout.marginRight=gridLayout.marginBottom=0;
+		composite.setLayout(gridLayout);
+		viewer=new TableViewer(composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		viewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		createColumns(composite, viewer);
 		viewer.setContentProvider(new ArrayContentProvider());
 		viewer.setSorter(new NameSorter());
 		viewer.setInput(getViewSite());
-		getViewSite().setSelectionProvider(viewer);
 		// Make lines and make header visible
 		final Table table=viewer.getTable();
 		table.setHeaderVisible(true);
@@ -149,9 +154,6 @@ public class TeamStatus extends ViewPart {
 								if (msg != null && (msg.getObject() instanceof AbstractPomodoroMessage)) {
 									if (msg.getObject() instanceof TimerMessage) {
 										TimerMessage tm=(TimerMessage) msg.getObject();
-										// if (tm.getSender() == null || tm.getSender().equals("")) {
-										// tm.setSender(msg.getSrc().toString());
-										// }
 										viewer.remove(tm);
 										viewer.add(tm);
 									}
@@ -170,17 +172,6 @@ public class TeamStatus extends ViewPart {
 		job.setRule(Activator.getDefault().getRule());
 		job.schedule();
 
-		// // Layout the viewer
-		GridData gridData=new GridData();
-		gridData.verticalAlignment=GridData.FILL;
-		gridData.horizontalSpan=2;
-		gridData.grabExcessHorizontalSpace=true;
-		gridData.grabExcessVerticalSpace=true;
-		gridData.horizontalAlignment=GridData.FILL;
-		viewer.getControl().setLayoutData(gridData);
-
-		// Create the help context id for the viewer's control
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "epomodoro.viewer");
 		makeActions();
 		hookContextMenu();
 		contributeToActionBars();
@@ -194,9 +185,10 @@ public class TeamStatus extends ViewPart {
 				TeamStatus.this.fillContextMenu(manager);
 			}
 		});
-		Menu menu=menuMgr.createContextMenu(viewer.getControl());
-		viewer.getControl().setMenu(menu);
+		Menu menu=menuMgr.createContextMenu(viewer.getTable());
+		viewer.getTable().setMenu(menu);
 		getSite().registerContextMenu(menuMgr, viewer);
+		getSite().setSelectionProvider(viewer);
 	}
 
 	private void contributeToActionBars() {
@@ -206,37 +198,19 @@ public class TeamStatus extends ViewPart {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(sendMessage);
 		manager.add(clearTable);
 		manager.add(connect);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
-		manager.add(sendMessage);
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
-		// manager.add(sendMessage);
 		manager.add(clearTable);
 		manager.add(connect);
 	}
 
 	private void makeActions() {
-		sendMessage=new Action() {
-			public void run() {
-				TextMessage message=new TextMessage();
-				try {
-					Activator.getDefault().getCommunication().sendMessage(message);
-				} catch (Exception e) {
-					LOG.log(Level.SEVERE, "Error sending message", e);
-				}
-			}
-		};
-		sendMessage.setText("Send Message");
-		sendMessage.setToolTipText("Send Message to user");
-		sendMessage.setImageDescriptor(Activator.getImageDescriptor(PluginImages.ICONS_MESSAGE));
-
 		clearTable=new Action() {
 			public void run() {
 				viewer.setInput(null);
@@ -287,5 +261,10 @@ public class TeamStatus extends ViewPart {
 	 */
 	public void setFocus() {
 		viewer.getControl().setFocus();
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		viewer.refresh();
 	}
 }

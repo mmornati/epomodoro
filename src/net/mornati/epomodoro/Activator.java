@@ -194,4 +194,8 @@ public class Activator extends AbstractUIPlugin {
 		return showDialog;
 	}
 
+	public Timer getScheduler() {
+		return scheduler;
+	}
+
 }

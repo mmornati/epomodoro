@@ -10,6 +10,7 @@ import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.PomodoroTimer;
 
+import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
@@ -18,6 +19,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
@@ -27,6 +29,8 @@ public class CountDownTimer extends ViewPart {
 	private static final Logger LOG=Logger.getLogger(CountDownTimer.class.getName());
 	long TOTAL_TIME;
 	private long time;
+	private Label countdown;
+	private Label countdownStatus;
 
 	final java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("mm : ss");
 
@@ -46,12 +50,12 @@ public class CountDownTimer extends ViewPart {
 		layout.verticalSpacing=9;
 		Label label=new Label(container, SWT.NULL);
 		label.setText("Timer:");
-		final Label countdown=new Label(container, SWT.NULL);
+		countdown=new Label(container, SWT.NULL);
 		countdown.setText(sdf.format(time));
 		final Label typeLabel=new Label(container, SWT.NULL);
-		typeLabel.setText("Type");
+		typeLabel.setText("");
 		final Button startButton=new Button(container, SWT.NULL);
-		scheduleTimer(startButton, countdown, typeLabel, 1000);
+		scheduleTimer(startButton, typeLabel, 1000);
 		startButton.setText("Start");
 		startButton.addSelectionListener(new SelectionListener() {
 
@@ -115,10 +119,10 @@ public class CountDownTimer extends ViewPart {
 		// tbMgr.add(scaleItem);
 		// tbMgr.update(true);
 		// aBars.updateActionBars();
+		addTimerToStatus();
 	}
 
-	// TODO: Refactor this to prevent errors during shutdown
-	private void scheduleTimer(final Button startButton, final Label timerLabel, final Label typeLabel, final int changeInterval) {
+	private void scheduleTimer(final Button startButton, final Label typeLabel, final int changeInterval) {
 		final PomodoroTimer internalTimer;
 		if (Activator.getDefault().getTimer() == null) {
 			internalTimer=Activator.getDefault().createTimer(TOTAL_TIME, PomodoroTimer.TYPE_WORK);
@@ -131,17 +135,19 @@ public class CountDownTimer extends ViewPart {
 					if (internalTimer.getStatus().equals(PomodoroTimer.STATUS_INITIALIZED)) {
 						startButton.setEnabled(true);
 					}
-					timerLabel.setText(internalTimer.getFormatTime());
+					countdown.setText(internalTimer.getFormatTime());
+					countdownStatus.setText(internalTimer.getFormatTime());
 					typeLabel.setText(internalTimer.getType() == PomodoroTimer.TYPE_WORK ? "W.T." : "P.T.");
 					if (Activator.getDefault().isShowDialog()) {
 						String message=(Activator.getDefault().getTimer().getType() == PomodoroTimer.TYPE_WORK ? "Working " : "Pausing ") + "Time finished";
 						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Pomodoro Timer Finished", message);
 						Activator.getDefault().setShowDialog(false);
 					}
-					scheduleTimer(startButton, timerLabel, typeLabel, changeInterval);
+					scheduleTimer(startButton, typeLabel, changeInterval);
 				} else {
-					timerLabel.setText(sdf.format(new Date(TOTAL_TIME)));
-					scheduleTimer(startButton, timerLabel, typeLabel, changeInterval);
+					countdown.setText(sdf.format(new Date(TOTAL_TIME)));
+					countdownStatus.setText(internalTimer.getFormatTime());
+					scheduleTimer(startButton, typeLabel, changeInterval);
 				}
 
 			}
@@ -149,7 +155,7 @@ public class CountDownTimer extends ViewPart {
 	}
 
 	private void checkTimerStatus() {
-		final Timer scheduler=new Timer();
+		final Timer scheduler=Activator.getDefault().getScheduler();
 		TimerTask task=new TimerTask() {
 			@Override
 			public void run() {
@@ -189,6 +195,23 @@ public class CountDownTimer extends ViewPart {
 	@Override
 	public void setFocus() {
 
+	}
+
+	private void addTimerToStatus() {
+		ControlContribution statusItem=new ControlContribution("control") {
+
+			@Override
+			protected Control createControl(Composite parent) {
+				Composite composite=new Composite(parent, SWT.NONE);
+				GridLayout gridLayout=new GridLayout();
+				gridLayout.marginWidth=gridLayout.marginHeight=gridLayout.verticalSpacing=gridLayout.horizontalSpacing=gridLayout.marginLeft=gridLayout.marginTop=gridLayout.marginRight=gridLayout.marginBottom=0;
+				composite.setLayout(gridLayout);
+				countdownStatus=new Label(composite, SWT.NULL);
+				countdownStatus.setText(sdf.format(time));
+				return composite;
+			}
+		};
+		getViewSite().getActionBars().getStatusLineManager().add(statusItem);
 	}
 
 }

@@ -58,5 +58,33 @@
             class="net.mornati.epomodoro.preference.PomodoroPreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="net.mornati.epomodoro.handlers.SendMessageHandler"
+            commandId="net.mornati.epomodoro.handlers.SendMessageHandler">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:epomodoro.views.TeamStatus">
+         <command
+               commandId="epomodoro.SendMessageCommand"
+               icon="icons/message.png"
+               label="Send Message"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="net.mornati.epomodoro.handlers.SendMessageHandler"
+            id="epomodoro.SendMessageCommand"
+            name="Send Message">
+      </command>
+   </extension>
 
 </plugin>

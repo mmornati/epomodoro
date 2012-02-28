@@ -28,8 +28,8 @@ public class PomodoroPreferencePage extends FieldEditorPreferencePage implements
 		addField(new StringFieldEditor(CLIENT_NAME, "Your Name:", getFieldEditorParent()));
 		addField(new IntegerFieldEditor(POMODORO_TIME, "Pomodoro Time (minutes):", getFieldEditorParent()));
 		addField(new IntegerFieldEditor(POMODORO_PAUSE, "Pomodoro Pause (minutes):", getFieldEditorParent()));
-		addField(new BooleanFieldEditor(WORK_PAUSE_AUTO_SWITCH, "Auto start pause:", getFieldEditorParent()));
-		addField(new BooleanFieldEditor(DISCARD_OWN_MESSAGE, "Discard own message in team table:", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(WORK_PAUSE_AUTO_SWITCH, "Auto start pause", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(DISCARD_OWN_MESSAGE, "Discard own message in team table", getFieldEditorParent()));
 
 	}
 

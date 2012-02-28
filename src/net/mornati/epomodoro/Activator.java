@@ -1,6 +1,13 @@
 package net.mornati.epomodoro;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import net.mornati.epomodoro.communication.Communication;
+import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.ConflictRule;
 import net.mornati.epomodoro.util.PomodoroTimer;
@@ -21,7 +28,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID="epomodoro"; //$NON-NLS-1$
+	public static final String PLUGIN_ID="net.mornati.epomodoro"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
@@ -30,6 +37,7 @@ public class Activator extends AbstractUIPlugin {
 	private ISchedulingRule jobRule;
 	private PomodoroTimer timer;
 	private boolean showDialog=false;
+	private Timer scheduler=new Timer();;
 
 	/**
 	 * The constructor
@@ -46,7 +54,11 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin=this;
+		IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
+		int preferenceTime=preferenceStore.getInt(PomodoroPreferencePage.POMODORO_TIME);
+		createTimer(preferenceTime * 60 * 1000, PomodoroTimer.TYPE_WORK);
 		initCommunication();
+		sendTimerMessage();
 	}
 
 	/*
@@ -57,6 +69,8 @@ public class Activator extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		plugin=null;
 		super.stop(context);
+		scheduler.cancel();
+		scheduler=null;
 		timer.interrupt();
 		timer=null;
 		communication.close();
@@ -103,6 +117,43 @@ public class Activator extends AbstractUIPlugin {
 		job.setUser(false);
 		job.setRule(getRule());
 		job.schedule();
+	}
+
+	private void sendTimerMessage() {
+		TimerTask task=new TimerTask() {
+
+			@Override
+			public void run() {
+				if (communication != null && communication.isConnected() && timer != null) {
+					TimerMessage message=new TimerMessage();
+					message.setCreated(new Date());
+					message.setTimer(timer.getFormatTime());
+					message.setStatus(timer.getStatus());
+					String senderMachine="";
+					try {
+						senderMachine=InetAddress.getLocalHost().getHostName();
+					} catch (UnknownHostException e) {
+						e.printStackTrace();
+					}
+					message.setSenderMachine(senderMachine);
+					IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
+					String sender=preferenceStore.getString(PomodoroPreferencePage.CLIENT_NAME);
+					if (sender != null && !sender.equals("")) {
+						message.setSender(sender);
+					} else {
+						message.setSender(senderMachine);
+					}
+					try {
+						communication.sendMessage(message);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+
+			}
+		};
+
+		scheduler.schedule(task, 1000, 1000);
 	}
 
 	public Communication getCommunication() {

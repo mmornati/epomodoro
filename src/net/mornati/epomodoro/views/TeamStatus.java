@@ -1,11 +1,15 @@
 package net.mornati.epomodoro.views;
 
-import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.communication.AbstractPomodoroMessage;
 import net.mornati.epomodoro.communication.Communication;
+import net.mornati.epomodoro.communication.TextMessage;
 import net.mornati.epomodoro.communication.TimerMessage;
+import net.mornati.epomodoro.preference.PomodoroPreferencePage;
+import net.mornati.epomodoro.util.PluginImages;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -17,8 +21,10 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerSorter;
@@ -30,7 +36,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -44,21 +49,24 @@ public class TeamStatus extends ViewPart {
 	 */
 	public static final String ID="epomodoro.views.SampleView";
 
+	private static final Logger LOG=Logger.getLogger(TeamStatus.class.getName());
+
 	private TableViewer viewer;
 	private Action sendMessage;
 	private Action clearTable;
+	private Action connect;
 
 	// This will create the columns for the table
 	private void createColumns(final Composite parent, final TableViewer viewer) {
-		String[] titles= { "Sender", "Pomodoro Status", "Pomodoro Timer" };
-		int[] bounds= { 100, 100, 100 };
+		String[] titles= { "Machine", "Sender Name", "Pomodoro Status", "Pomodoro Timer" };
+		int[] bounds= { 100, 100, 100, 100 };
 
 		TableViewerColumn col=createTableViewerColumn(titles[0], bounds[0], 0);
 		col.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				TimerMessage m=(TimerMessage) element;
-				return m.getSender();
+				return m.getSenderMachine();
 			}
 		});
 
@@ -67,11 +75,20 @@ public class TeamStatus extends ViewPart {
 			@Override
 			public String getText(Object element) {
 				TimerMessage m=(TimerMessage) element;
-				return m.getStatus();
+				return m.getSender();
 			}
 		});
 
 		col=createTableViewerColumn(titles[2], bounds[2], 2);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				TimerMessage m=(TimerMessage) element;
+				return m.getStatus();
+			}
+		});
+
+		col=createTableViewerColumn(titles[3], bounds[3], 3);
 		col.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -105,11 +122,12 @@ public class TeamStatus extends ViewPart {
 	 * This is a callback that will allow us to create the viewer and initialize it.
 	 */
 	public void createPartControl(Composite parent) {
-		viewer=new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+		viewer=new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		createColumns(parent, viewer);
 		viewer.setContentProvider(new ArrayContentProvider());
 		viewer.setSorter(new NameSorter());
 		viewer.setInput(getViewSite());
+		getViewSite().setSelectionProvider(viewer);
 		// Make lines and make header visible
 		final Table table=viewer.getTable();
 		table.setHeaderVisible(true);
@@ -121,8 +139,7 @@ public class TeamStatus extends ViewPart {
 					try {
 						Thread.sleep(1000);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOG.log(Level.SEVERE, "Error sleeping thread", e);
 					}
 				}
 				Activator.getDefault().getCommunication().setReceiver(new ReceiverAdapter() {
@@ -139,7 +156,7 @@ public class TeamStatus extends ViewPart {
 										viewer.add(tm);
 									}
 								} else {
-									System.out.println("Received a wrong message");
+									LOG.log(Level.WARNING, "Received a wrong message");
 								}
 							}
 						});
@@ -153,7 +170,7 @@ public class TeamStatus extends ViewPart {
 		job.setRule(Activator.getDefault().getRule());
 		job.schedule();
 
-		// Layout the viewer
+		// // Layout the viewer
 		GridData gridData=new GridData();
 		gridData.verticalAlignment=GridData.FILL;
 		gridData.horizontalSpan=2;
@@ -191,6 +208,7 @@ public class TeamStatus extends ViewPart {
 	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(sendMessage);
 		manager.add(clearTable);
+		manager.add(connect);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
@@ -199,28 +217,25 @@ public class TeamStatus extends ViewPart {
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
-//		manager.add(sendMessage);
+		// manager.add(sendMessage);
 		manager.add(clearTable);
+		manager.add(connect);
 	}
 
 	private void makeActions() {
 		sendMessage=new Action() {
 			public void run() {
+				TextMessage message=new TextMessage();
 				try {
-					TimerMessage message=new TimerMessage();
-					message.setCreated(new Date());
-					message.setStatus("RUNNING");
-					message.setTimer(new Date().toString());
-					Communication.getInstance().sendMessage(message);
+					Activator.getDefault().getCommunication().sendMessage(message);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOG.log(Level.SEVERE, "Error sending message", e);
 				}
 			}
 		};
 		sendMessage.setText("Send Message");
 		sendMessage.setToolTipText("Send Message to user");
-		sendMessage.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_FORWARD));
+		sendMessage.setImageDescriptor(Activator.getImageDescriptor(PluginImages.ICONS_MESSAGE));
 
 		clearTable=new Action() {
 			public void run() {
@@ -229,7 +244,41 @@ public class TeamStatus extends ViewPart {
 		};
 		clearTable.setText("Clear Table");
 		clearTable.setToolTipText("Clear Table Content");
-		clearTable.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_REMOVE));
+		clearTable.setImageDescriptor(Activator.getImageDescriptor(PluginImages.ICONS_CLEAR));
+
+		connect=new Action() {
+			public void run() {
+				Communication communication=Activator.getDefault().getCommunication();
+				if (communication != null) {
+					if (communication.isConnected()) {
+						communication.close();
+					} else {
+						IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
+						String groupName=preferenceStore.getString(PomodoroPreferencePage.GROUP_NAME);
+						boolean discardOwnMessage=preferenceStore.getBoolean(PomodoroPreferencePage.DISCARD_OWN_MESSAGE);
+						try {
+							communication.connect(groupName, discardOwnMessage);
+						} catch (Exception e) {
+							LOG.log(Level.SEVERE, "Error connecting to group", e);
+						}
+					}
+					Display.getDefault().timerExec(4000, new Runnable() {
+						public void run() {
+							if (Activator.getDefault().getCommunication().isConnected()) {
+								connect.setImageDescriptor(Activator.getImageDescriptor(PluginImages.ICONS_CONNECTED));
+								connect.setToolTipText("Disconnect from Team");
+							} else {
+								connect.setImageDescriptor(Activator.getImageDescriptor(PluginImages.ICONS_DICONNECTED));
+								connect.setToolTipText("Connect to Team");
+							}
+						}
+					});
+				}
+			}
+		};
+		connect.setText("Team Connection");
+		connect.setToolTipText("Disconnect from Team");
+		connect.setImageDescriptor(Activator.getImageDescriptor(PluginImages.ICONS_DICONNECTED));
 
 	}
 

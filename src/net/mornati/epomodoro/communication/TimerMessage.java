@@ -39,7 +39,7 @@ public class TimerMessage extends AbstractPomodoroMessage {
 			return false;
 		}
 		TimerMessage t=(TimerMessage) o;
-		if (this.getSender() != null && this.getSender().equals(t.getSender())) {
+		if (this.getSender() != null && this.getSenderMachine().equals(t.getSenderMachine())) {
 			return true;
 		}
 		return false;

@@ -4,9 +4,11 @@ import java.net.URL;
 
 import net.mornati.epomodoro.Activator;
 
+import org.jgroups.Address;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
+import org.jgroups.util.SingletonAddress;
 
 public class Communication {
 

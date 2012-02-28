@@ -1,7 +1,5 @@
 package net.mornati.epomodoro.views;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -9,7 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.mornati.epomodoro.Activator;
-import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.PomodoroTimer;
 
@@ -102,10 +99,25 @@ public class CountDownTimer extends ViewPart {
 			}
 		});
 		checkTimerStatus();
-		sendTimerMessage(Activator.getDefault().getTimer());
+		// sendTimerMessage(Activator.getDefault().getTimer());
 
+		// IActionBars aBars=getViewSite().getActionBars();
+		// IToolBarManager tbMgr=aBars.getToolBarManager();
+		//
+		// IContributionItem scaleItem=new ControlContribution("type") {
+		// protected Control createControl(Composite parent) {
+		// Composite container=new Composite(parent, SWT.NULL);
+		// Label label=new Label(container, SWT.NONE);
+		// label.setText("TEST");
+		// return container;
+		// };
+		// };
+		// tbMgr.add(scaleItem);
+		// tbMgr.update(true);
+		// aBars.updateActionBars();
 	}
 
+	// TODO: Refactor this to prevent errors during shutdown
 	private void scheduleTimer(final Button startButton, final Label timerLabel, final Label typeLabel, final int changeInterval) {
 		final PomodoroTimer internalTimer;
 		if (Activator.getDefault().getTimer() == null) {
@@ -171,40 +183,6 @@ public class CountDownTimer extends ViewPart {
 			}
 
 		};
-		scheduler.schedule(task, 1000, 1000);
-	}
-
-	private void sendTimerMessage(final PomodoroTimer timer) {
-		final Timer scheduler=new Timer();
-		TimerTask task=new TimerTask() {
-
-			@Override
-			public void run() {
-				if (Activator.getDefault().getCommunication() != null && Activator.getDefault().getCommunication().isConnected() && timer != null) {
-					TimerMessage message=new TimerMessage();
-					message.setCreated(new Date());
-					message.setTimer(timer.getFormatTime());
-					message.setStatus(timer.getStatus());
-					IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
-					String sender=preferenceStore.getString(PomodoroPreferencePage.CLIENT_NAME);
-					if (sender == null || sender.equals("")) {
-						try {
-							sender=InetAddress.getLocalHost().getHostName();
-						} catch (UnknownHostException e) {
-							LOG.log(Level.SEVERE, "Error retrieving workstation name", e);
-						}
-					}
-					message.setSender(sender);
-					try {
-						Activator.getDefault().getCommunication().sendMessage(message);
-					} catch (Exception e) {
-						LOG.log(Level.SEVERE, "Error sending message", e);
-					}
-				}
-
-			}
-		};
-
 		scheduler.schedule(task, 1000, 1000);
 	}
 

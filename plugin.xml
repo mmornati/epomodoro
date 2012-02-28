@@ -86,5 +86,11 @@
             name="Send Message">
       </command>
    </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="net.mornati.epomodoro.Startup">
+      </startup>
+   </extension>
 
 </plugin>

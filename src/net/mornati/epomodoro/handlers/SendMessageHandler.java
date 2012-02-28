@@ -42,7 +42,6 @@ public class SendMessageHandler extends AbstractHandler implements IHandler {
 						e.printStackTrace();
 					}
 				}
-				System.out.println(element.toString());
 			}
 		}
 		return null;

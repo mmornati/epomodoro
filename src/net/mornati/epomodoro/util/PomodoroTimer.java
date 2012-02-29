@@ -15,8 +15,8 @@ public class PomodoroTimer extends Thread {
 	private boolean paused=false;
 	private boolean started=false;
 	private boolean interrupted=false;
-	public static final String STATUS_WORKING_TIME="Working time";
-	public static final String STATUS_PAUSING_TIME="Pausing time";
+	public static final String STATUS_WORKING_TIME="Work time";
+	public static final String STATUS_PAUSING_TIME="Pause time";
 	public static final String STATUS_PAUSED="Paused";
 	public static final String STATUS_FINISHED="Finished";
 	public static final String STATUS_INITIALIZED="Initilized";

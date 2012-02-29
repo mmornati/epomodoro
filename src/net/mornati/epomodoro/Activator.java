@@ -23,6 +23,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -220,15 +222,38 @@ public class Activator extends AbstractUIPlugin {
 		Display.getDefault().timerExec(changeInterval, new Runnable() {
 			public void run() {
 				if (internalTimer != null) {
-					if (internalTimer.getStatus().equals(PomodoroTimer.STATUS_INITIALIZED)) {
-						for (Button startButton : startButtons) {
-							if (!startButton.isDisposed()) {
+
+					for (Button startButton : startButtons) {
+						if (!startButton.isDisposed()) {
+							if (internalTimer.getStatus().equals(PomodoroTimer.STATUS_INITIALIZED)) {
 								startButton.setEnabled(true);
+							} else {
+								startButton.setEnabled(false);
 							}
 						}
 					}
+
+					String buttonText=timer.getStatus().equals(PomodoroTimer.STATUS_PAUSED) ? "Restart" : "Pause";
+					for (Button pauseButton : pauseButtons) {
+						if (!pauseButton.isDisposed()) {
+							if (internalTimer.getStatus().equals(PomodoroTimer.STATUS_PAUSING_TIME)
+									|| internalTimer.getStatus().equals(PomodoroTimer.STATUS_WORKING_TIME)
+									|| internalTimer.getStatus().equals(PomodoroTimer.STATUS_PAUSED)) {
+								pauseButton.setEnabled(true);
+								pauseButton.setText(buttonText);
+							} else {
+								pauseButton.setEnabled(false);
+							}
+						}
+					}
+
 					for (Label countdown : counterLabels) {
 						if (!countdown.isDisposed()) {
+							if (timer.getType() == PomodoroTimer.TYPE_WORK) {
+								countdown.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+							} else {
+								countdown.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
+							}
 							countdown.setText(internalTimer.getFormatTime());
 						}
 					}
@@ -237,10 +262,12 @@ public class Activator extends AbstractUIPlugin {
 						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Pomodoro Timer Finished", message);
 						setShowDialog(false);
 					}
+
 					scheduleTimer(changeInterval);
 				} else {
 					for (Label countdown : counterLabels) {
 						if (!countdown.isDisposed()) {
+							countdown.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
 							countdown.setText(sdf.format(new Date(timer.getConfigWorkTime())));
 						}
 					}

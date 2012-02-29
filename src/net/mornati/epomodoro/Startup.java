@@ -39,6 +39,7 @@ public class Startup implements IStartup {
 						imgLabel.setImage(image);
 						Label countdownStatus=new Label(composite, SWT.NONE);
 						countdownStatus.setText(Activator.getDefault().getTimer().getFormatTime());
+						countdownStatus.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
 						Activator.getDefault().subscribeCounterLabel(countdownStatus);
 						GridData layoutData=new GridData(SWT.FILL, SWT.CENTER, false, true);
 						layoutData.widthHint=50;

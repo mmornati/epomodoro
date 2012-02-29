@@ -57,8 +57,9 @@ public class Startup implements IStartup {
 					statusLineManager.add(statusItem);
 					statusLineManager.update(true);
 				}
+				Activator.getDefault().scheduleTimer(1000);
+				Activator.getDefault().checkTimerStatus();
 			}
 		});
-
 	}
 }

@@ -40,8 +40,6 @@ public class CountDownTimer extends ViewPart {
 		Activator.getDefault().subscribeStartButton(UIUtil.createStartButton(container));
 		Activator.getDefault().subscribePauseButton(UIUtil.createPauseButton(container));
 		UIUtil.createResetButton(container);
-		Activator.getDefault().scheduleTimer(1000);
-		Activator.getDefault().checkTimerStatus();
 	}
 
 	@Override

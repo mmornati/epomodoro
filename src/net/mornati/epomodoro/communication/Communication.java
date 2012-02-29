@@ -35,6 +35,7 @@ public class Communication {
 
 	public void connect(final String groupName, boolean discardOwnMessage) throws Exception {
 		URL url=Activator.getDefault().getBundle().getResource("resources/udp.xml");
+		System.setProperty("java.net.preferIPv4Stack", "true");
 		channel=new JChannel(url.openStream());
 		channel.connect(groupName);
 		channel.setDiscardOwnMessages(discardOwnMessage);

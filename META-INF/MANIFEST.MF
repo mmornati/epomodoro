@@ -9,4 +9,4 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
- lib/jgroups-3.1.0.Alpha2.jar
+ lib/jgroups-3.1.0.Alpha3.jar

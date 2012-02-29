@@ -12,6 +12,7 @@ import net.mornati.epomodoro.communication.Communication;
 import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.ConflictRule;
+import net.mornati.epomodoro.util.PluginImages;
 import net.mornati.epomodoro.util.PomodoroTimer;
 import net.mornati.epomodoro.util.UIUtil;
 
@@ -222,30 +223,13 @@ public class Activator extends AbstractUIPlugin {
 		Display.getDefault().timerExec(changeInterval, new Runnable() {
 			public void run() {
 				if (internalTimer != null) {
-
-					for (Button startButton : startButtons) {
-						if (!startButton.isDisposed()) {
-							if (internalTimer.getStatus().equals(PomodoroTimer.STATUS_INITIALIZED)) {
-								startButton.setEnabled(true);
-							} else {
-								startButton.setEnabled(false);
-							}
-						}
-					}
-
-					String buttonText=timer.getStatus().equals(PomodoroTimer.STATUS_PAUSED) ? "Restart" : "Pause";
-					for (Button pauseButton : pauseButtons) {
-						if (!pauseButton.isDisposed()) {
-							if (internalTimer.getStatus().equals(PomodoroTimer.STATUS_PAUSING_TIME)
-									|| internalTimer.getStatus().equals(PomodoroTimer.STATUS_WORKING_TIME)
-									|| internalTimer.getStatus().equals(PomodoroTimer.STATUS_PAUSED)) {
-								pauseButton.setEnabled(true);
-								pauseButton.setText(buttonText);
-							} else {
-								pauseButton.setEnabled(false);
-							}
-						}
-					}
+//					if (internalTimer.getStatus().equals(PomodoroTimer.STATUS_INITIALIZED)) {
+//						for (Button startButton : startButtons) {
+//							if (!startButton.isDisposed()) {
+//								startButton.setEnabled(true);
+//							}
+//						}
+//					}
 
 					for (Label countdown : counterLabels) {
 						if (!countdown.isDisposed()) {
@@ -258,7 +242,7 @@ public class Activator extends AbstractUIPlugin {
 						}
 					}
 					if (Activator.getDefault().isShowDialog()) {
-						String message=(timer.getType() == PomodoroTimer.TYPE_WORK ? "Working " : "Pausing ") + "Time finished";
+						String message=(timer.getType() == PomodoroTimer.TYPE_WORK ? "Work " : "Pause ") + "Time finished";
 						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Pomodoro Timer Finished", message);
 						setShowDialog(false);
 					}

@@ -50,6 +50,7 @@ public class Startup implements IStartup {
 						UIUtil.createResetButton(composite);
 						return composite;
 					}
+
 				};
 				IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
 				boolean showInStatusBar=preferenceStore.getBoolean(PomodoroPreferencePage.SHOW_TIMER_STATUS_BAR);

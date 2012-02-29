@@ -7,6 +7,8 @@ import net.mornati.epomodoro.communication.TextMessage;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
@@ -17,24 +19,14 @@ public class UIUtil {
 
 	public static Button createStartButton(Composite parent) {
 		final Button startButton=new Button(parent, SWT.FLAT | SWT.TOGGLE);
-		startButton.setText("Start");
 		startButton.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Activator.getDefault().getTimer().start();
-				List<Button> startButtons=Activator.getDefault().getStartButtons();
-				for (Button startButton : startButtons) {
-					if (!startButton.isDisposed()) {
-						startButton.setEnabled(false);
-						startButton.setSelection(false);
-					}
-				}
-
-				List<Button> pauseButtons=Activator.getDefault().getPauseButtons();
-				for (Button pauseButton : pauseButtons) {
-					if (!pauseButton.isDisposed()) {
-						pauseButton.setEnabled(true);
+				for (Button pause : Activator.getDefault().getPauseButtons()) {
+					if (!pause.isDisposed()) {
+						pause.redraw();
 					}
 				}
 			}
@@ -44,24 +36,35 @@ public class UIUtil {
 
 			}
 		});
+		startButton.addPaintListener(new PaintListener() {
+
+			@Override
+			public void paintControl(PaintEvent e) {
+				Button button=(Button) e.getSource();
+				if (!button.isDisposed()) {
+					boolean enabledStatus=Activator.getDefault().getTimer() != null
+							&& Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_INITIALIZED);
+					if (button.getEnabled() && !enabledStatus) {
+						button.setEnabled(false);
+					} else if (!button.getEnabled() && enabledStatus) {
+						button.setEnabled(true);
+					}
+				}
+
+			}
+		});
+		startButton.setToolTipText("Start");
+		startButton.setImage(Activator.getImageDescriptor(PluginImages.ICONS_PLAY).createImage());
 		return startButton;
 	}
 
 	public static Button createPauseButton(Composite parent) {
 		final Button pauseButton=new Button(parent, SWT.NULL);
-		pauseButton.setText("Pause");
 		pauseButton.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Activator.getDefault().getTimer().pause();
-				String buttonText=Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_PAUSED) ? "Restart" : "Pause";
-				List<Button> pauseButtons=Activator.getDefault().getPauseButtons();
-				for (Button pauseButton : pauseButtons) {
-					if (!pauseButton.isDisposed()) {
-						pauseButton.setText(buttonText);
-					}
-				}
 			}
 
 			@Override
@@ -70,12 +73,36 @@ public class UIUtil {
 			}
 		});
 		pauseButton.setEnabled(false);
+		pauseButton.setImage(Activator.getImageDescriptor(PluginImages.ICONS_PAUSE).createImage());
+		pauseButton.setToolTipText("Pause");
+		pauseButton.addPaintListener(new PaintListener() {
+
+			@Override
+			public void paintControl(PaintEvent e) {
+				Button button=(Button) e.getSource();
+				if (!button.isDisposed()) {
+					boolean enabledStatus=Activator.getDefault().getTimer() != null
+							&& !Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_INITIALIZED);
+					if (button.getEnabled() && !enabledStatus) {
+						button.setEnabled(false);
+					} else if (!button.getEnabled() && enabledStatus) {
+						button.setEnabled(true);
+					}
+					if (button.getToolTipText().equals("Pause") && Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_PAUSED)) {
+						button.setImage(Activator.getImageDescriptor(PluginImages.ICONS_PLAY).createImage());
+						button.setToolTipText("Play");
+					} else if (button.getToolTipText().equals("Play") && !Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_PAUSED)) {
+						button.setImage(Activator.getImageDescriptor(PluginImages.ICONS_PAUSE).createImage());
+						pauseButton.setToolTipText("Pause");
+					}
+				}
+			}
+		});
 		return pauseButton;
 	}
 
 	public static Button createResetButton(Composite parent) {
 		final Button resetButton=new Button(parent, SWT.NULL);
-		resetButton.setText("Reset");
 		resetButton.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -85,13 +112,14 @@ public class UIUtil {
 				for (Button startButton : startButtons) {
 					if (!startButton.isDisposed()) {
 						startButton.setEnabled(true);
+						startButton.setImage(Activator.getImageDescriptor(PluginImages.ICONS_PLAY).createImage());
 					}
 				}
 				List<Button> pauseButtons=Activator.getDefault().getPauseButtons();
 				for (Button pauseButton : pauseButtons) {
 					if (!pauseButton.isDisposed()) {
-						pauseButton.setText("Pause");
 						pauseButton.setEnabled(false);
+						pauseButton.setImage(Activator.getImageDescriptor(PluginImages.ICONS_PAUSE_DISABLED).createImage());
 					}
 				}
 			}
@@ -101,6 +129,8 @@ public class UIUtil {
 
 			}
 		});
+		resetButton.setImage(Activator.getImageDescriptor(PluginImages.ICONS_RESET).createImage());
+		resetButton.setToolTipText("Reset");
 		return resetButton;
 
 	}

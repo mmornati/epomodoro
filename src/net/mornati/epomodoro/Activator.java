@@ -12,7 +12,6 @@ import net.mornati.epomodoro.communication.Communication;
 import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.ConflictRule;
-import net.mornati.epomodoro.util.PluginImages;
 import net.mornati.epomodoro.util.PomodoroTimer;
 import net.mornati.epomodoro.util.UIUtil;
 
@@ -25,7 +24,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -221,6 +219,7 @@ public class Activator extends AbstractUIPlugin {
 							} else {
 								countdown.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
 							}
+							countdown.setToolTipText(timer.getType() == PomodoroTimer.TYPE_PAUSE ? "Pause Timer" : "Work Timer");
 							countdown.setText(internalTimer.getFormatTime());
 						}
 					}

@@ -94,11 +94,13 @@ public class UIUtil {
 	}
 
 	private static void addDetailsToButton(Button startButton) {
-		String imagePath=Activator.getDefault().getTimer() != null && Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_WORKING_TIME) ? PluginImages.ICONS_PAUSE
-				: PluginImages.ICONS_PLAY;
+		String imagePath=Activator.getDefault().getTimer() != null
+				&& (Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_WORKING_TIME) || Activator.getDefault().getTimer().getStatus()
+						.equals(PomodoroTimer.STATUS_PAUSING_TIME)) ? PluginImages.ICONS_PAUSE : PluginImages.ICONS_PLAY;
 		startButton.setImage(Activator.getImageDescriptor(imagePath).createImage());
-		String tooltipText=Activator.getDefault().getTimer() != null && Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_WORKING_TIME) ? "Pause"
-				: "Play";
+		String tooltipText=Activator.getDefault().getTimer() != null
+				&& (Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_WORKING_TIME) || Activator.getDefault().getTimer().getStatus()
+						.equals(PomodoroTimer.STATUS_PAUSING_TIME)) ? "Pause" : "Play";
 		startButton.setToolTipText(tooltipText);
 	}
 

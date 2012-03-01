@@ -12,6 +12,8 @@ import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jgroups.Address;
+import org.jgroups.Channel;
+import org.jgroups.ChannelListener;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
@@ -36,9 +38,29 @@ public class Communication {
 	public void connect(final String groupName, boolean discardOwnMessage) throws Exception {
 		URL url=Activator.getDefault().getBundle().getResource("resources/udp.xml");
 		System.setProperty("java.net.preferIPv4Stack", "true");
-		channel=new JChannel(url.openStream());
+		channel=new JChannel();
 		channel.connect(groupName);
 		channel.setDiscardOwnMessages(discardOwnMessage);
+		channel.addChannelListener(new ChannelListener() {
+
+			@Override
+			public void channelDisconnected(Channel channel) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void channelConnected(Channel channel) {
+				System.out.println(channel.getName());
+
+			}
+
+			@Override
+			public void channelClosed(Channel channel) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 	}
 
 	public void sendMessage(AbstractPomodoroMessage message) throws Exception {

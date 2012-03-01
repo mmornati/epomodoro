@@ -38,7 +38,6 @@ public class CountDownTimer extends ViewPart {
 		final Label typeLabel=new Label(container, SWT.NULL);
 		typeLabel.setText("");
 		Activator.getDefault().subscribeStartButton(UIUtil.createStartButton(container));
-		Activator.getDefault().subscribePauseButton(UIUtil.createPauseButton(container));
 		UIUtil.createResetButton(container);
 	}
 

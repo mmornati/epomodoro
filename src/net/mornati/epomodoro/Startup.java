@@ -46,7 +46,6 @@ public class Startup implements IStartup {
 						layoutData.horizontalIndent=10;
 						countdownStatus.setLayoutData(layoutData);
 						Activator.getDefault().subscribeStartButton(UIUtil.createStartButton(composite));
-						Activator.getDefault().subscribePauseButton(UIUtil.createPauseButton(composite));
 						UIUtil.createResetButton(composite);
 						return composite;
 					}

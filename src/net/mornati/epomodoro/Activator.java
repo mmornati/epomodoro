@@ -52,7 +52,6 @@ public class Activator extends AbstractUIPlugin {
 	private static final Logger LOG=Logger.getLogger(Activator.class.getName());
 	private List<Button> startButtons=new ArrayList<Button>();
 	private List<Label> counterLabels=new ArrayList<Label>();
-	private List<Button> pauseButtons=new ArrayList<Button>();
 
 	/*
 	 * (non-Javadoc)
@@ -201,16 +200,8 @@ public class Activator extends AbstractUIPlugin {
 		counterLabels.add(label);
 	}
 
-	public void subscribePauseButton(Button button) {
-		pauseButtons.add(button);
-	}
-
 	public List<Button> getStartButtons() {
 		return startButtons;
-	}
-
-	public List<Button> getPauseButtons() {
-		return pauseButtons;
 	}
 
 	public void scheduleTimer(final int changeInterval) {
@@ -223,14 +214,6 @@ public class Activator extends AbstractUIPlugin {
 		Display.getDefault().timerExec(changeInterval, new Runnable() {
 			public void run() {
 				if (internalTimer != null) {
-//					if (internalTimer.getStatus().equals(PomodoroTimer.STATUS_INITIALIZED)) {
-//						for (Button startButton : startButtons) {
-//							if (!startButton.isDisposed()) {
-//								startButton.setEnabled(true);
-//							}
-//						}
-//					}
-
 					for (Label countdown : counterLabels) {
 						if (!countdown.isDisposed()) {
 							if (timer.getType() == PomodoroTimer.TYPE_WORK) {

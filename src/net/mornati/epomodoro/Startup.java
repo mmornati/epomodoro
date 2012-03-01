@@ -34,7 +34,7 @@ public class Startup implements IStartup {
 						GridLayout gridLayout=new GridLayout(5, false);
 						gridLayout.marginWidth=gridLayout.marginHeight=gridLayout.verticalSpacing=gridLayout.horizontalSpacing=gridLayout.marginLeft=gridLayout.marginTop=gridLayout.marginRight=gridLayout.marginBottom=0;
 						composite.setLayout(gridLayout);
-						Image image=Activator.getImageDescriptor(PluginImages.ICONS_POMODORO).createImage();
+						Image image=PluginImages.getImage(PluginImages.ICONS_POMODORO);
 						Label imgLabel=new Label(composite, SWT.NONE);
 						imgLabel.setImage(image);
 						Label countdownStatus=new Label(composite, SWT.NONE);

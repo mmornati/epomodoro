@@ -1,10 +1,3 @@
-
-<!--
-  Default stack using IP multicasting. It is similar to the "udp"
-  stack in stacks.xml, but doesn't use streaming state transfer and flushing
-  author: Bela Ban
--->
-
 <config xmlns="urn:org:jgroups"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/JGroups-3.1.xsd">

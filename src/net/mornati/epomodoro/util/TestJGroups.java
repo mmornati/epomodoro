@@ -5,6 +5,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.net.URL;
+
+import net.mornati.epomodoro.Activator;
 
 import org.jgroups.Address;
 import org.jgroups.Channel;
@@ -26,12 +29,8 @@ public class TestJGroups extends ReceiverAdapter implements ChannelListener {
 			channel.setDiscardOwnMessages(true);
 			channel.setReceiver(this);
 			
-			channel.connect("test", null, 2000);
+			channel.connect("MyTeam", null, 2000);
 			
-			while (true) {
-				channel.send(new Message(null, null, "messages from " + channel.getName()));
-				Thread.sleep(10000);
-			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

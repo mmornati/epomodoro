@@ -27,7 +27,6 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -174,6 +173,7 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 				Activator.getDefault().getCommunication().setReceiver(new ReceiverAdapter() {
 					public void receive(final Message msg) {
 						if (msg != null && (msg.getObject() instanceof AbstractPomodoroMessage)) {
+							
 							if (msg.getObject() instanceof TimerMessage) {
 								TimerMessage tm=(TimerMessage) msg.getObject();
 								if (receivedMessages.contains(tm)) {
@@ -248,7 +248,14 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 	private void makeActions() {
 		clearTable=new Action() {
 			public void run() {
-				viewer.setInput(null);
+				receivedMessages.clear();
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
+						if (!viewer.getTable().isDisposed()) {
+							viewer.refresh();
+						}
+					}
+				});
 			}
 		};
 		clearTable.setText("Clear Table");
@@ -264,9 +271,8 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 					} else {
 						IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
 						String groupName=preferenceStore.getString(PomodoroPreferencePage.GROUP_NAME);
-						boolean discardOwnMessage=preferenceStore.getBoolean(PomodoroPreferencePage.DISCARD_OWN_MESSAGE);
 						try {
-							communication.connect(groupName, discardOwnMessage);
+							communication.connect(groupName);
 						} catch (Exception e) {
 							LOG.log(Level.SEVERE, "Error connecting to group", e);
 						}

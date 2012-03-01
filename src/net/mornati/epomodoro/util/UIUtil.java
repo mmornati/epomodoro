@@ -72,7 +72,7 @@ public class UIUtil {
 
 			}
 		});
-		resetButton.setImage(Activator.getImageDescriptor(PluginImages.ICONS_RESET).createImage());
+		resetButton.setImage(PluginImages.getImage(PluginImages.ICONS_RESET));
 		resetButton.setToolTipText("Reset");
 		return resetButton;
 
@@ -97,7 +97,7 @@ public class UIUtil {
 		String imagePath=Activator.getDefault().getTimer() != null
 				&& (Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_WORKING_TIME) || Activator.getDefault().getTimer().getStatus()
 						.equals(PomodoroTimer.STATUS_PAUSING_TIME)) ? PluginImages.ICONS_PAUSE : PluginImages.ICONS_PLAY;
-		startButton.setImage(Activator.getImageDescriptor(imagePath).createImage());
+		startButton.setImage(PluginImages.getImage(imagePath));
 		String tooltipText=Activator.getDefault().getTimer() != null
 				&& (Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_WORKING_TIME) || Activator.getDefault().getTimer().getStatus()
 						.equals(PomodoroTimer.STATUS_PAUSING_TIME)) ? "Pause" : "Play";

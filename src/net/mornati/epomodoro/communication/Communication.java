@@ -6,23 +6,26 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jgroups.Address;
-import org.jgroups.Channel;
-import org.jgroups.ChannelListener;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
+import org.jgroups.protocols.UDP;
+import org.jgroups.stack.Protocol;
 
 public class Communication {
 
 	private static Communication communication;
 	private JChannel channel;
 	private List<TextMessage> receivedTextMessages=new ArrayList<TextMessage>();
+	private static final Logger LOG=Logger.getLogger(Communication.class.getName());
 
 	private Communication() {
 
@@ -35,32 +38,24 @@ public class Communication {
 		return communication;
 	}
 
-	public void connect(final String groupName, boolean discardOwnMessage) throws Exception {
+	public void connect(final String groupName) throws Exception {
 		URL url=Activator.getDefault().getBundle().getResource("resources/udp.xml");
-		System.setProperty("java.net.preferIPv4Stack", "true");
+		IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
+		boolean forceIPv4=preferenceStore.getBoolean(PomodoroPreferencePage.FORCE_IPV4);
+		boolean discardOwnMessage=preferenceStore.getBoolean(PomodoroPreferencePage.DISCARD_OWN_MESSAGE);
+		String ipAddress=preferenceStore.getString(PomodoroPreferencePage.BIND_IP_ADDR);
+		if (forceIPv4) {
+			LOG.log(Level.INFO, "Forcing IPv4 usage");
+			System.setProperty("java.net.preferIPv4Stack", "true");
+		} else {
+			System.setProperty("java.net.preferIPv4Stack", "false");
+		}
 		channel=new JChannel();
+		if (ipAddress != null && !ipAddress.equals("")) {
+			bindAddress(channel, ipAddress);
+		}
 		channel.connect(groupName);
 		channel.setDiscardOwnMessages(discardOwnMessage);
-		channel.addChannelListener(new ChannelListener() {
-
-			@Override
-			public void channelDisconnected(Channel channel) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void channelConnected(Channel channel) {
-				System.out.println(channel.getName());
-
-			}
-
-			@Override
-			public void channelClosed(Channel channel) {
-				// TODO Auto-generated method stub
-
-			}
-		});
 	}
 
 	public void sendMessage(AbstractPomodoroMessage message) throws Exception {
@@ -92,6 +87,10 @@ public class Communication {
 
 	public void resetReceivedMessages() {
 		receivedTextMessages.clear();
+	}
+
+	public String getBindAddress() {
+		return channel.getAddressAsString();
 	}
 
 	public void addReceivedMessage(TextMessage message) {
@@ -128,4 +127,12 @@ public class Communication {
 		return message;
 	}
 
+	private void bindAddress(JChannel channel, String ip) throws UnknownHostException {
+		for (Protocol protocol : channel.getProtocolStack().getProtocols()) {
+			if (protocol instanceof UDP) {
+				((UDP) protocol).setValue("bind_addr", InetAddress.getByName(ip));
+				break;
+			}
+		}
+	}
 }

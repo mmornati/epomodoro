@@ -109,10 +109,9 @@ public class Activator extends AbstractUIPlugin {
 			protected IStatus run(IProgressMonitor monitor) {
 				IPreferenceStore preferenceStore=getPreferenceStore();
 				String groupName=preferenceStore.getString(PomodoroPreferencePage.GROUP_NAME);
-				boolean discardOwnMessage=preferenceStore.getBoolean(PomodoroPreferencePage.DISCARD_OWN_MESSAGE);
 				communication=Communication.getInstance();
 				try {
-					communication.connect(groupName, discardOwnMessage);
+					communication.connect(groupName);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -145,7 +144,7 @@ public class Activator extends AbstractUIPlugin {
 			}
 		};
 
-		scheduler.schedule(task, 1000, 1000);
+		scheduler.schedule(task, 1000, 5000);
 	}
 
 	public Communication getCommunication() {
@@ -201,7 +200,7 @@ public class Activator extends AbstractUIPlugin {
 	public List<Button> getStartButtons() {
 		return startButtons;
 	}
-
+	
 	public void scheduleTimer(final int changeInterval) {
 		final PomodoroTimer internalTimer;
 		if (timer == null) {

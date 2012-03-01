@@ -20,6 +20,8 @@ public class PomodoroPreferenceInitializer extends AbstractPreferenceInitializer
 		store.setDefault(PomodoroPreferencePage.WORK_PAUSE_AUTO_SWITCH, true);
 		store.setDefault(PomodoroPreferencePage.DISCARD_OWN_MESSAGE, false);
 		store.setDefault(PomodoroPreferencePage.SHOW_TIMER_STATUS_BAR, true);
+		store.setDefault(PomodoroPreferencePage.FORCE_IPV4, true);
+		store.setDefault(PomodoroPreferencePage.BIND_IP_ADDR, "");
 	}
 
 }

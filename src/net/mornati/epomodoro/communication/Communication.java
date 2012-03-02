@@ -116,6 +116,7 @@ public class Communication {
 			e.printStackTrace();
 		}
 		message.setSenderMachine(senderMachine);
+		message.setSourceAddress(Communication.getInstance().channel.getAddress());
 		IPreferenceStore preferenceStore=Activator.getDefault().getPreferenceStore();
 		String sender=preferenceStore.getString(PomodoroPreferencePage.CLIENT_NAME);
 		if (sender != null && !sender.equals("")) {

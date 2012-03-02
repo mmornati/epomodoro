@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Display;
 public class UIUtil {
 
 	public static Button createStartButton(Composite parent) {
-		final Button startButton=new Button(parent, SWT.FLAT | SWT.TOGGLE);
+		final Button startButton=new Button(parent, SWT.FLAT);
 		startButton.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -49,7 +49,7 @@ public class UIUtil {
 	}
 
 	public static Button createResetButton(Composite parent) {
-		final Button resetButton=new Button(parent, SWT.NULL);
+		final Button resetButton=new Button(parent, SWT.FLAT);
 		resetButton.addSelectionListener(new SelectionListener() {
 
 			@Override

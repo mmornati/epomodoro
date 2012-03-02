@@ -50,7 +50,7 @@ public class Communication {
 		} else {
 			System.setProperty("java.net.preferIPv4Stack", "false");
 		}
-		channel=new JChannel();
+		channel=new JChannel(url);
 		if (ipAddress != null && !ipAddress.equals("")) {
 			bindAddress(channel, ipAddress);
 		}

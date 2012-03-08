@@ -2,26 +2,16 @@ package net.mornati.epomodoro.views;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.mornati.epomodoro.Activator;
-import net.mornati.epomodoro.communication.AbstractPomodoroMessage;
 import net.mornati.epomodoro.communication.Communication;
-import net.mornati.epomodoro.communication.TextMessage;
 import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.PluginImages;
 import net.mornati.epomodoro.util.PomodoroComparator;
-import net.mornati.epomodoro.util.PomodoroTimer;
-import net.mornati.epomodoro.util.UIUtil;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -45,8 +35,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
-import org.jgroups.Message;
-import org.jgroups.ReceiverAdapter;
 
 public class TeamStatus extends ViewPart implements PropertyChangeListener {
 
@@ -61,7 +49,6 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 	private Action clearTable;
 	private Action connect;
 	private PomodoroComparator comparator;
-	private List<TimerMessage> receivedMessages=new ArrayList<TimerMessage>();
 
 	// This will create the columns for the table
 	private void createColumns(final Composite parent, final TableViewer viewer) {
@@ -153,63 +140,17 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 		createColumns(composite, viewer);
 		viewer.setContentProvider(new ArrayContentProvider());
 		viewer.setSorter(new NameSorter());
-		viewer.setInput(receivedMessages);
+		viewer.setInput(Activator.getDefault().getReceivedMessages());
 		comparator=new PomodoroComparator();
 		viewer.setComparator(comparator);
 		// Make lines and make header visible
 		final Table table=viewer.getTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
-		Job job=new Job("AddReceiver") {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				while (Job.getJobManager().currentJob() != null && Job.getJobManager().currentJob().getName().equals("ConnectToJGroups")) {
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						LOG.log(Level.SEVERE, "Error sleeping thread", e);
-					}
-				}
-				Activator.getDefault().getCommunication().setReceiver(new ReceiverAdapter() {
-					public void receive(final Message msg) {
-						if (msg != null && (msg.getObject() instanceof AbstractPomodoroMessage)) {
-							
-							if (msg.getObject() instanceof TimerMessage) {
-								TimerMessage tm=(TimerMessage) msg.getObject();
-								if (receivedMessages.contains(tm)) {
-									receivedMessages.remove(tm);
-								}
-								receivedMessages.add(tm);
-							} else if (msg.getObject() instanceof TextMessage) {
-								Activator.getDefault().getCommunication().addReceivedMessage((TextMessage) msg.getObject());
-								if (!Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_WORKING_TIME)) {
-									UIUtil.showReceivedMessages();
-								}
-
-							}
-						} else {
-							LOG.log(Level.WARNING, "Received a wrong message");
-						}
-						Display.getDefault().asyncExec(new Runnable() {
-							public void run() {
-								if (!viewer.getTable().isDisposed()) {
-									viewer.refresh();
-								}
-							}
-						});
-					}
-				});
-				return Status.OK_STATUS;
-			}
-
-		};
-		job.setUser(false);
-		job.setRule(Activator.getDefault().getRule());
-		job.schedule();
-
 		makeActions();
 		hookContextMenu();
 		contributeToActionBars();
+		Activator.getDefault().setTableListener(viewer);
 	}
 
 	private void hookContextMenu() {
@@ -248,7 +189,7 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 	private void makeActions() {
 		clearTable=new Action() {
 			public void run() {
-				receivedMessages.clear();
+				Activator.getDefault().getReceivedMessages().clear();
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
 						if (!viewer.getTable().isDisposed()) {

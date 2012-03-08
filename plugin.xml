@@ -49,7 +49,7 @@
       <page
             class="net.mornati.epomodoro.preference.PomodoroPreferencePage"
             id="epomodoro.Preferences"
-            name="Pomodoro Preferences">
+            name="ePomodoro">
       </page>
    </extension>
    <extension

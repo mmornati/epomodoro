@@ -1,5 +1,6 @@
 package net.mornati.epomodoro;
 
+import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.Log;
 import net.mornati.epomodoro.util.PluginImages;
@@ -9,6 +10,7 @@ import net.mornati.epomodoro.views.TeamStatus;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -50,6 +52,40 @@ public class Startup implements IStartup {
 								} catch (PartInitException e) {
 									Log.INSTANCE.logError("Failed to open view " + TeamStatus.ID, e);
 								}
+							}
+						});
+						//						class MyToolTip extends ToolTip {
+						//							private StyledText styledText;
+						//
+						//							public MyToolTip(Control parent) {
+						//								super(parent);
+						//							}
+						//
+						//							@Override
+						//							protected Composite createToolTipContentArea(Event event, Composite parent) {
+						//								Composite compo=new Composite(parent, SWT.NONE);
+						//								compo.setSize(200, 200);
+						//								compo.setLayout(new FillLayout());
+						//								styledText=new StyledText(compo, SWT.NONE);
+						//								//								styledText.setText("gfjksfdjksdfsdfhsdfjkh\nfklsdjsdjklf");
+						//								return compo;
+						//							}
+						//
+						//
+						//							public StyledText getStyledText() {
+						//								return styledText;
+						//							}
+						//						}
+						final DefaultToolTip tooltip=new DefaultToolTip(countdownStatus);
+						Activator.getDefault().addCommunicationListener(new Runnable() {
+							@Override
+							public void run() {
+								StringBuffer buffer=new StringBuffer();
+								for (TimerMessage msg : Activator.getDefault().getReceivedMessages()) {
+									buffer.append(msg.getSender()).append(" => ").append(msg.getTimer()).append('\n');
+								}
+								tooltip.setText(buffer.toString());
+								//								tooltip.getStyledText().setText(buffer.toString());
 							}
 						});
 						countdownStatus.setText(Activator.getDefault().getTimer().getFormatTime());

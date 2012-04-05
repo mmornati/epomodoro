@@ -2,8 +2,6 @@ package net.mornati.epomodoro.views;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.communication.Communication;
@@ -48,7 +46,6 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 	private Action clearTable;
 	private Action connect;
 	private PomodoroComparator comparator;
-	private final List<TimerMessage> receivedMessages=new ArrayList<TimerMessage>();
 
 	// This will create the columns for the table
 	private void createColumns(final Composite parent, final TableViewer viewer) {
@@ -151,7 +148,14 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 		makeActions();
 		hookContextMenu();
 		contributeToActionBars();
-		Activator.getDefault().setTableListener(viewer);
+		Activator.getDefault().addCommunicationListener(new Runnable() {
+			@Override
+			public void run() {
+				if (!viewer.getTable().isDisposed()) {
+					viewer.refresh();
+				}
+			}
+		});
 	}
 
 	private void hookContextMenu() {

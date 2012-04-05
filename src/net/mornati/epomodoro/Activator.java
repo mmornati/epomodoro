@@ -2,6 +2,7 @@ package net.mornati.epomodoro;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -155,7 +156,7 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	public Communication getCommunication() {
-		return this.communication;
+		return communication;
 	}
 
 	public ISchedulingRule getRule() {
@@ -226,7 +227,7 @@ public class Activator extends AbstractUIPlugin {
 							} else {
 								countdown.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
 							}
-							countdown.setToolTipText(timer.getType() == PomodoroTimer.TYPE_PAUSE ? "Pause Timer" : "Work Timer");
+							//							countdown.setToolTipText(timer.getType() == PomodoroTimer.TYPE_PAUSE ? "Pause Timer" : "Work Timer");
 							countdown.setText(internalTimer.getFormatTime());
 						}
 					}
@@ -316,15 +317,11 @@ public class Activator extends AbstractUIPlugin {
 								}
 
 							}
-							if (viewer != null) {
-								Display.getDefault().asyncExec(new Runnable() {
-									@Override
-									public void run() {
-										if (!viewer.getTable().isDisposed()) {
-											viewer.refresh();
-										}
-									}
-								});
+							Display display=Display.getDefault();
+							if (display != null && !display.isDisposed()) {
+								for (Runnable listener : listeners) {
+									display.asyncExec(listener);
+								}
 							}
 						} else {
 							Log.INSTANCE.logWarning("Error sleeping Thread");
@@ -344,7 +341,13 @@ public class Activator extends AbstractUIPlugin {
 		return receivedMessages;
 	}
 
-	public void setTableListener(TableViewer viewer) {
-		this.viewer=viewer;
+	private final List<Runnable> listeners=Collections.synchronizedList(new ArrayList<Runnable>());
+
+	public void addCommunicationListener(Runnable listener) {
+		listeners.add(listener);
+	}
+
+	public void removeCommunicationListener(Runnable listener) {
+		listeners.remove(listener);
 	}
 }

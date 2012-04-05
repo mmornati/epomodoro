@@ -3,7 +3,10 @@ package net.mornati.epomodoro;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.PluginImages;
 import net.mornati.epomodoro.util.UIUtil;
+import net.mornati.epomodoro.views.TeamStatus;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -14,13 +17,15 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IStartup;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 
 public class Startup implements IStartup {
-
 	@Override
 	public void earlyStartup() {
 		Display.getDefault().asyncExec(new Runnable() {
@@ -38,6 +43,17 @@ public class Startup implements IStartup {
 						Label imgLabel=new Label(composite, SWT.NONE);
 						imgLabel.setImage(image);
 						Label countdownStatus=new Label(composite, SWT.NONE);
+						countdownStatus.addListener(SWT.MouseDoubleClick, new Listener() {
+							@Override
+							public void handleEvent(Event event) {
+								try {
+									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TeamStatus.ID);
+								} catch (PartInitException e) {
+									Activator.getDefault().getLog()
+											.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Failed to open view " + TeamStatus.ID, e));
+								}
+							}
+						});
 						countdownStatus.setText(Activator.getDefault().getTimer().getFormatTime());
 						countdownStatus.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
 						Activator.getDefault().subscribeCounterLabel(countdownStatus);

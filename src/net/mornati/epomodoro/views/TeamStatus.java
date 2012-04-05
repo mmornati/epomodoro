@@ -53,7 +53,7 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String ID="epomodoro.views.SampleView";
+	public static final String ID=TeamStatus.class.getName();
 
 	private static final Logger LOG=Logger.getLogger(TeamStatus.class.getName());
 
@@ -61,7 +61,7 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 	private Action clearTable;
 	private Action connect;
 	private PomodoroComparator comparator;
-	private List<TimerMessage> receivedMessages=new ArrayList<TimerMessage>();
+	private final List<TimerMessage> receivedMessages=new ArrayList<TimerMessage>();
 
 	// This will create the columns for the table
 	private void createColumns(final Composite parent, final TableViewer viewer) {
@@ -143,6 +143,7 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize it.
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		Composite composite=new Composite(parent, SWT.NONE);
 		GridLayout gridLayout=new GridLayout();
@@ -171,9 +172,10 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 					}
 				}
 				Activator.getDefault().getCommunication().setReceiver(new ReceiverAdapter() {
+					@Override
 					public void receive(final Message msg) {
 						if (msg != null && (msg.getObject() instanceof AbstractPomodoroMessage)) {
-							
+
 							if (msg.getObject() instanceof TimerMessage) {
 								TimerMessage tm=(TimerMessage) msg.getObject();
 								if (receivedMessages.contains(tm)) {
@@ -191,6 +193,7 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 							LOG.log(Level.WARNING, "Received a wrong message");
 						}
 						Display.getDefault().asyncExec(new Runnable() {
+							@Override
 							public void run() {
 								if (!viewer.getTable().isDisposed()) {
 									viewer.refresh();
@@ -216,6 +219,7 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 		MenuManager menuMgr=new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				TeamStatus.this.fillContextMenu(manager);
 			}
@@ -247,9 +251,11 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 
 	private void makeActions() {
 		clearTable=new Action() {
+			@Override
 			public void run() {
 				receivedMessages.clear();
 				Display.getDefault().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						if (!viewer.getTable().isDisposed()) {
 							viewer.refresh();
@@ -263,6 +269,7 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 		clearTable.setImageDescriptor(Activator.getImageDescriptor(PluginImages.ICONS_CLEAR));
 
 		connect=new Action() {
+			@Override
 			public void run() {
 				Communication communication=Activator.getDefault().getCommunication();
 				if (communication != null) {
@@ -278,6 +285,7 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 						}
 					}
 					Display.getDefault().timerExec(4000, new Runnable() {
+						@Override
 						public void run() {
 							if (Activator.getDefault().getCommunication().isConnected()) {
 								connect.setImageDescriptor(Activator.getImageDescriptor(PluginImages.ICONS_CONNECTED));
@@ -300,6 +308,7 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
+	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}

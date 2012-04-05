@@ -1,5 +1,6 @@
 package net.mornati.epomodoro;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,14 +47,14 @@ public class Activator extends AbstractUIPlugin {
 	private PomodoroTimer timer;
 	private boolean showDialog=false;
 	private Timer scheduler=new Timer();
-	final java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("mm : ss");
+	private final SimpleDateFormat sdf=new SimpleDateFormat("mm : ss");
 	private static final Logger LOG=Logger.getLogger(Activator.class.getName());
-	private List<Button> startButtons=new ArrayList<Button>();
-	private List<Label> counterLabels=new ArrayList<Label>();
+	private final List<Button> startButtons=new ArrayList<Button>();
+	private final List<Label> counterLabels=new ArrayList<Label>();
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	@Override
@@ -69,7 +70,7 @@ public class Activator extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override
@@ -85,7 +86,7 @@ public class Activator extends AbstractUIPlugin {
 
 	/**
 	 * Returns the shared instance
-	 * 
+	 *
 	 * @return the shared instance
 	 */
 	public static Activator getDefault() {
@@ -94,7 +95,7 @@ public class Activator extends AbstractUIPlugin {
 
 	/**
 	 * Returns an image descriptor for the image file at the given plug-in relative path
-	 * 
+	 *
 	 * @param path
 	 *            the path
 	 * @return the image descriptor
@@ -200,7 +201,7 @@ public class Activator extends AbstractUIPlugin {
 	public List<Button> getStartButtons() {
 		return startButtons;
 	}
-	
+
 	public void scheduleTimer(final int changeInterval) {
 		final PomodoroTimer internalTimer;
 		if (timer == null) {
@@ -209,6 +210,7 @@ public class Activator extends AbstractUIPlugin {
 			internalTimer=timer;
 		}
 		Display.getDefault().timerExec(changeInterval, new Runnable() {
+			@Override
 			public void run() {
 				if (internalTimer != null) {
 					for (Label countdown : counterLabels) {

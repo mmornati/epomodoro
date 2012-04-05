@@ -4,13 +4,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.communication.Communication;
 import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
+import net.mornati.epomodoro.util.Log;
 import net.mornati.epomodoro.util.PluginImages;
 import net.mornati.epomodoro.util.PomodoroComparator;
 
@@ -44,8 +43,6 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID=TeamStatus.class.getName();
-
-	private static final Logger LOG=Logger.getLogger(TeamStatus.class.getName());
 
 	private TableViewer viewer;
 	private Action clearTable;
@@ -223,7 +220,7 @@ public class TeamStatus extends ViewPart implements PropertyChangeListener {
 						try {
 							communication.connect(groupName);
 						} catch (Exception e) {
-							LOG.log(Level.SEVERE, "Error connecting to group", e);
+							Log.INSTANCE.logError("Error connecting to group", e);
 						}
 					}
 					Display.getDefault().timerExec(4000, new Runnable() {

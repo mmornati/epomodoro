@@ -1,12 +1,11 @@
 package net.mornati.epomodoro;
 
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
+import net.mornati.epomodoro.util.Log;
 import net.mornati.epomodoro.util.PluginImages;
 import net.mornati.epomodoro.util.UIUtil;
 import net.mornati.epomodoro.views.TeamStatus;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -49,8 +48,7 @@ public class Startup implements IStartup {
 								try {
 									PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(TeamStatus.ID);
 								} catch (PartInitException e) {
-									Activator.getDefault().getLog()
-											.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Failed to open view " + TeamStatus.ID, e));
+									Log.INSTANCE.logError("Failed to open view " + TeamStatus.ID, e);
 								}
 							}
 						});

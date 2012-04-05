@@ -1,7 +1,5 @@
 package net.mornati.epomodoro.views;
 
-import java.util.logging.Logger;
-
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.util.UIUtil;
 
@@ -12,9 +10,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
 public class CountDownTimer extends ViewPart {
-
-	private static final Logger LOG=Logger.getLogger(CountDownTimer.class.getName());
-	private long time;
+	private final long time;
 	private Label countdown;
 
 	final java.text.SimpleDateFormat sdf=new java.text.SimpleDateFormat("mm : ss");

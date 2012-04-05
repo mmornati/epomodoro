@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.mornati.epomodoro.communication.AbstractPomodoroMessage;
 import net.mornati.epomodoro.communication.Communication;
@@ -15,6 +13,7 @@ import net.mornati.epomodoro.communication.TextMessage;
 import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.ConflictRule;
+import net.mornati.epomodoro.util.Log;
 import net.mornati.epomodoro.util.PomodoroTimer;
 import net.mornati.epomodoro.util.UIUtil;
 
@@ -53,7 +52,6 @@ public class Activator extends AbstractUIPlugin {
 	private boolean showDialog=false;
 	private Timer scheduler=new Timer();
 	private final SimpleDateFormat sdf=new SimpleDateFormat("mm : ss");
-	private static final Logger LOG=Logger.getLogger(Activator.class.getName());
 	private final List<Button> startButtons=new ArrayList<Button>();
 	private final List<Label> counterLabels=new ArrayList<Label>();
 	private final List<TimerMessage> receivedMessages=new ArrayList<TimerMessage>();
@@ -267,7 +265,7 @@ public class Activator extends AbstractUIPlugin {
 						try {
 							Thread.sleep(1000);
 						} catch (InterruptedException e) {
-							LOG.log(Level.SEVERE, "Error sleeping Thread", e);
+							Log.INSTANCE.logError("Error sleeping Thread", e);
 						}
 					}
 					UIUtil.showReceivedMessages();
@@ -297,7 +295,7 @@ public class Activator extends AbstractUIPlugin {
 					try {
 						Thread.sleep(1000);
 					} catch (InterruptedException e) {
-						LOG.log(Level.SEVERE, "Error sleeping thread", e);
+						Log.INSTANCE.logError("Error sleeping Thread", e);
 					}
 				}
 				communication.setReceiver(new ReceiverAdapter() {
@@ -329,7 +327,7 @@ public class Activator extends AbstractUIPlugin {
 								});
 							}
 						} else {
-							LOG.log(Level.WARNING, "Received a wrong message");
+							Log.INSTANCE.logWarning("Error sleeping Thread");
 						}
 					}
 				});

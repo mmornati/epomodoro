@@ -6,11 +6,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
+import net.mornati.epomodoro.util.Log;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jgroups.Address;
@@ -24,8 +23,7 @@ public class Communication {
 
 	private static Communication communication;
 	private JChannel channel;
-	private List<TextMessage> receivedTextMessages=new ArrayList<TextMessage>();
-	private static final Logger LOG=Logger.getLogger(Communication.class.getName());
+	private final List<TextMessage> receivedTextMessages=new ArrayList<TextMessage>();
 
 	private Communication() {
 
@@ -45,7 +43,7 @@ public class Communication {
 		boolean discardOwnMessage=preferenceStore.getBoolean(PomodoroPreferencePage.DISCARD_OWN_MESSAGE);
 		String ipAddress=preferenceStore.getString(PomodoroPreferencePage.BIND_IP_ADDR);
 		if (forceIPv4) {
-			LOG.log(Level.INFO, "Forcing IPv4 usage");
+			Log.INSTANCE.logInfo("Forcing IPv4 usage");
 			System.setProperty("java.net.preferIPv4Stack", "true");
 		} else {
 			System.setProperty("java.net.preferIPv4Stack", "false");

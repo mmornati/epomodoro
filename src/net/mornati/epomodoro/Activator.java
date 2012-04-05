@@ -9,7 +9,9 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.mornati.epomodoro.communication.AbstractPomodoroMessage;
 import net.mornati.epomodoro.communication.Communication;
+import net.mornati.epomodoro.communication.TextMessage;
 import net.mornati.epomodoro.communication.TimerMessage;
 import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 import net.mornati.epomodoro.util.ConflictRule;
@@ -24,11 +26,14 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.jgroups.Message;
+import org.jgroups.ReceiverAdapter;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -51,6 +56,8 @@ public class Activator extends AbstractUIPlugin {
 	private static final Logger LOG=Logger.getLogger(Activator.class.getName());
 	private final List<Button> startButtons=new ArrayList<Button>();
 	private final List<Label> counterLabels=new ArrayList<Label>();
+	private final List<TimerMessage> receivedMessages=new ArrayList<TimerMessage>();
+	private TableViewer viewer;
 
 	/*
 	 * (non-Javadoc)
@@ -66,6 +73,7 @@ public class Activator extends AbstractUIPlugin {
 		createTimer(preferenceTime * 60 * 1000, PomodoroTimer.TYPE_WORK);
 		initCommunication();
 		sendTimerMessage();
+		checkMessages();
 	}
 
 	/*
@@ -279,5 +287,66 @@ public class Activator extends AbstractUIPlugin {
 
 		};
 		scheduler.schedule(task, 1000, 1000);
+	}
+
+	public void checkMessages() {
+		Job job=new Job("AddReceiver") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				while (Job.getJobManager().currentJob() != null && Job.getJobManager().currentJob().getName().equals("ConnectToJGroups")) {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						LOG.log(Level.SEVERE, "Error sleeping thread", e);
+					}
+				}
+				communication.setReceiver(new ReceiverAdapter() {
+					@Override
+					public void receive(final Message msg) {
+						if (msg != null && (msg.getObject() instanceof AbstractPomodoroMessage)) {
+
+							if (msg.getObject() instanceof TimerMessage) {
+								TimerMessage tm=(TimerMessage) msg.getObject();
+								if (receivedMessages.contains(tm)) {
+									receivedMessages.remove(tm);
+								}
+								receivedMessages.add(tm);
+							} else if (msg.getObject() instanceof TextMessage) {
+								communication.addReceivedMessage((TextMessage) msg.getObject());
+								if (!timer.getStatus().equals(PomodoroTimer.STATUS_WORKING_TIME)) {
+									UIUtil.showReceivedMessages();
+								}
+
+							}
+							if (viewer != null) {
+								Display.getDefault().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										if (!viewer.getTable().isDisposed()) {
+											viewer.refresh();
+										}
+									}
+								});
+							}
+						} else {
+							LOG.log(Level.WARNING, "Received a wrong message");
+						}
+					}
+				});
+				return Status.OK_STATUS;
+			}
+
+		};
+		job.setUser(false);
+		job.setRule(getRule());
+		job.schedule();
+	}
+
+	public List<TimerMessage> getReceivedMessages() {
+		return receivedMessages;
+	}
+
+	public void setTableListener(TableViewer viewer) {
+		this.viewer=viewer;
 	}
 }

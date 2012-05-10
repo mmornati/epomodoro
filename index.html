@@ -36,32 +36,50 @@
         <span class="blc"></span><span class="trc"></span>
         </div>
         <article class="markdown-body">
-          <h3>Welcome to GitHub Pages.</h3>
+    	<h3>Installation</h3>
+<p>To install ePomodoro plugin you can download the project zip file (for example from <a href="https://github.com/mmornati/epomodoro/zipball/master"><span>here</span></a>), decompress it and copy the jar file in your eclipse installation.
+If you have Eclipse installed, for example, in /etc/eclipse folder, you should copy your jar file in /etc/eclipse/plugins and then restart your eclipse to activate the plugin.
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+The best and easy way in naturally using the update site (or the eclipse marketplace). All required operations will be accomplished automatically.
+</p>
+<img src="http://blog.mornati.net/wp-content/uploads/2012/03/ePomodoroMarketPlace.png" alt="Eclipse Marketplace"/>
+<p>After the eclipse restart you should see the pomodoro timer in your status bar
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+<img src="http://blog.mornati.net/wp-content/uploads/2012/03/ePomodoro5.png" alt="Pomodoro Timer"/>
+</p>
+<h3>Configuration</h3>
+<p>In your Eclipse preferences page, you can access going to Windows->Preferences menu, you can change settings for ePomodoro plugin.</p>
+<img src="http://blog.mornati.net/wp-content/uploads/2012/03/ePomodoro6.png" alt="Preferences"/>
+<p>
+	<ul>
+	 <li><b>Team Name</b>: is the name of your team used to exchange pomodoro messages. Messages are sent only to users with the same team name configured</li>
+	 <li><b>Your Name</b>: is an optional parameter. By default the name of your machine is sent to others members, but if you want you can personalize your name changing this parameter.</li>
+	 <li><b>Pomodoro Time</b>: time of your pomodoro (we could call it working time). By default it's set to 25 minutes, the default for the Pomodoro Technique</li>
+	 <li><b>Pomodoro Pause</b>: pause timer after any working time. Default to 5 minutes</li>
+	 <li><b>Auto start pause</b>: if you select this property (true by default) you are saying you want to auto start your pause timer. After the 25 minutes pomodoro you will receive a popup message saying that your working time is finished, and then the pause timer is started up.</li>
+	 <li><b>Discard own messages in team table</b>: by default to false. This is used to set if you want to see your timer in Team Table view or not.</li>
+	 <li><b>Show timer in status bar</b>: by default is true. You can decide to use timer inside the Pomodoro Timer view or showing it directly in your eclipse status bar. To prevent the usage of many additional views, by default we put the timer on the status bar. After the installation, if all worked well, you should see your pomodoro in the status bar</li>
+	 <li><b>Force IPv4</b>: is used to configured the communication part of ePomodoro (to share messages with your team). If you have IPv6 configured on your system but your network does not support IPv6 you won't be able to send messages. Forcing the usage of IPv4 the problem should be fixed.</li>
+	 <li><b>Bind IP Address</b>: optional parameter. If you have for example more interfaces and you want to start ePomodoro just on one of these insterface, you can enter in this box the IP address you want to use.</li>
+	</ul>
+</p>
+<h3>Usage</h3>
+<p>Usage of ePomodoro is really simple. <i>Play</i> button on the status bar start your timer (you should see countdown changes); <i>Reset</i> button is used to restore the timer; <i>Pause</i> when timer is started, the play button changes to pause button. Pressing it you put your timer in pause.
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
-
-<h3>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
+Same things could be done in the ePomodoro <b>Countdown Timer</b> view (windows->show view->others->ePomodoro).
+To see your team you have to show the <b>Team Status</b> view (windows->show view->others->ePomodoro).
+</p>
+<img src="http://blog.mornati.net/wp-content/uploads/2012/03/ePomodoro2.png" alt="Team Status"/>
+<p>
+Here you have a simple table with all team members listed and status of each Pomodoro timer.
+With a rigth-click on a machine name you can select to send a message to the selected user(s) (multiple selection allowed in the table).
+These messages will be shown to target users only when they finished the "work pomodoro", no message will be shown when you are working.</p>
 <h3>Authors and Contributors</h3>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>
+Marco Mornati <a href="http://blog.mornati.net" class="user-mention">@marcomornati</a><br/>
+Christophe Moine <a href="http://www.linkedin.com/in/cmoine" class="user-mention">@cmoine</a>
+</p>
         </article>
       </div>
     </div>

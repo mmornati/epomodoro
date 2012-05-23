@@ -69,7 +69,7 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
-            locationURI="popup:epomodoro.views.TeamStatus">
+            locationURI="popup:net.mornati.epomodoro.views.TeamStatus">
          <command
                commandId="epomodoro.SendMessageCommand"
                icon="icons/message.png"

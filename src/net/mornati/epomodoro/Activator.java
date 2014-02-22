@@ -28,6 +28,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.FontMetrics;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -57,6 +60,7 @@ public class Activator extends AbstractUIPlugin {
 	private final List<Label> counterLabels=new ArrayList<Label>();
 	private final List<TimerMessage> receivedMessages=new ArrayList<TimerMessage>();
 	private TableViewer viewer;
+	private String taskDescription = "";
 
 	/*
 	 * (non-Javadoc)
@@ -182,6 +186,7 @@ public class Activator extends AbstractUIPlugin {
 			timer.interrupt();
 			timer=new PomodoroTimer(totalTime, type);
 		}
+		taskDescription = "";
 		return timer;
 	}
 
@@ -217,6 +222,7 @@ public class Activator extends AbstractUIPlugin {
 			internalTimer=timer;
 		}
 		Display.getDefault().timerExec(changeInterval, new Runnable() {
+
 			@Override
 			public void run() {
 				if (internalTimer != null) {
@@ -228,7 +234,7 @@ public class Activator extends AbstractUIPlugin {
 								countdown.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
 							}
 							//							countdown.setToolTipText(timer.getType() == PomodoroTimer.TYPE_PAUSE ? "Pause Timer" : "Work Timer");
-							countdown.setText(internalTimer.getFormatTime());
+							countdown.setText(internalTimer.getFormatTime() + "   " + taskDescription );
 						}
 					}
 					if (Activator.getDefault().isShowDialog()) {
@@ -242,7 +248,7 @@ public class Activator extends AbstractUIPlugin {
 					for (Label countdown : counterLabels) {
 						if (!countdown.isDisposed()) {
 							countdown.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
-							countdown.setText(sdf.format(new Date(timer.getConfigWorkTime())));
+							countdown.setText(sdf.format(new Date(timer.getConfigWorkTime())) + "   " + taskDescription );
 						}
 					}
 					scheduleTimer(changeInterval);
@@ -250,6 +256,15 @@ public class Activator extends AbstractUIPlugin {
 
 			}
 		});
+	}
+
+	protected void adjustSize(Label countdown) {
+		GC gc = new GC(countdown);
+		FontMetrics fm = gc.getFontMetrics();
+		int charWidth = fm.getAverageCharWidth();
+		int width = countdown.computeSize(charWidth	* countdown.getText().length(),	SWT.DEFAULT).x;
+		((GridData) countdown.getLayoutData()).widthHint = width;
+		countdown.getParent().getParent().layout(true, true);
 	}
 
 	public void checkTimerStatus() {
@@ -349,5 +364,13 @@ public class Activator extends AbstractUIPlugin {
 
 	public void removeCommunicationListener(Runnable listener) {
 		listeners.remove(listener);
+	}
+
+	public String getTaskDescription() {
+		return taskDescription;
+	}
+
+	public void setTaskDescription(String taskDescription) {
+		this.taskDescription = taskDescription;
 	}
 }

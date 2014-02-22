@@ -92,7 +92,7 @@ public class Startup implements IStartup {
 						countdownStatus.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
 						Activator.getDefault().subscribeCounterLabel(countdownStatus);
 						GridData layoutData=new GridData(SWT.FILL, SWT.CENTER, false, true);
-						layoutData.widthHint=50;
+						layoutData.widthHint=250;
 						layoutData.horizontalIndent=10;
 						countdownStatus.setLayoutData(layoutData);
 						Activator.getDefault().subscribeStartButton(UIUtil.createStartButton(composite));

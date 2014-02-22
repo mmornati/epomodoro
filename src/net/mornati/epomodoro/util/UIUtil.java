@@ -5,7 +5,9 @@ import java.util.List;
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.communication.TextMessage;
 
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -22,6 +24,13 @@ public class UIUtil {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (Activator.getDefault().getTimer() != null && Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_INITIALIZED)) {
+					if (Activator.getDefault().getTaskDescription().trim().equals("")) {
+						InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(), 
+								"Adding a Task", "Enter a task description", "", null);
+						if (dlg.open() == Window.OK) {
+							Activator.getDefault().setTaskDescription(dlg.getValue());
+						}
+					}
 					Activator.getDefault().getTimer().start();
 				} else {
 					Activator.getDefault().getTimer().pause();

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <relativePath>../pom.xml</relativePath>
+    <groupId>net.mornati</groupId>
+    <artifactId>epomodoro</artifactId>
+    <version>1.0.7-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>net.mornati.epomodoro</artifactId>
+  <packaging>eclipse-plugin</packaging>
+</project> 

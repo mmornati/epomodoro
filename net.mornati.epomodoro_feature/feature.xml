@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.mornati.epomodoro"
+      id="net.mornati.epomodoro_feature"
       label="net.mornati.epomodoro"
       version="1.0.7.qualifier"
       provider-name="mornati.net">

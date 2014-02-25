@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="net.mornati.epomodoro"
+      label="net.mornati.epomodoro"
+      version="1.0.7.qualifier"
+      provider-name="mornati.net">
+
+   <description url="https://marketplace.eclipse.org/content/epomodoro">
+      ePomodoro a plugin to manage your working time using the Pomodoro Technique. It includes also a team pomodoro solution to share your timers and messages with your working team.
+   </description>
+
+   <copyright url="http://repo.mornati.net/eclipse/">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://repo.mornati.net/eclipse/">
+      [Enter License Description here.]
+   </license>
+
+   <url>
+      <update label="Mornati.net UpdateSite" url="http://repo.mornati.net/eclipse/"/>
+   </url>
+
+   <plugin
+         id="net.mornati.epomodoro"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

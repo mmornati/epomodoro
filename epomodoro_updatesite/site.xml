@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/net.mornati.epomodoro_1.0.7.201402251350.jar" id="net.mornati.epomodoro" version="1.0.7.201402251350">
+      <category name="net.mornati.epomodoro"/>
+   </feature>
+   <category-def name="net.mornati.epomodoro" label="net.mornati.epomodoro">
+      <description>
+         ePomodoro
+      </description>
+   </category-def>
+</site>

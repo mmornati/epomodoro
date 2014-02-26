@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.mornati.epomodoro.Activator;
 import net.mornati.epomodoro.communication.TextMessage;
+import net.mornati.epomodoro.preference.PomodoroPreferencePage;
 
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -24,7 +25,8 @@ public class UIUtil {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (Activator.getDefault().getTimer() != null && Activator.getDefault().getTimer().getStatus().equals(PomodoroTimer.STATUS_INITIALIZED)) {
-					if (Activator.getDefault().getTaskDescription().trim().equals("")) {
+					boolean pomodoroDescription = Activator.getDefault().getPreferenceStore().getBoolean(PomodoroPreferencePage.POMODORO_DESCRIPTION);
+					if (pomodoroDescription && Activator.getDefault().getTaskDescription().trim().equals("")) {
 						InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(), 
 								"Adding a Task", "Enter a task description", "", null);
 						if (dlg.open() == Window.OK) {

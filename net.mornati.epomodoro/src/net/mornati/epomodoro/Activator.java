@@ -235,6 +235,7 @@ public class Activator extends AbstractUIPlugin {
 							}
 							//							countdown.setToolTipText(timer.getType() == PomodoroTimer.TYPE_PAUSE ? "Pause Timer" : "Work Timer");
 							countdown.setText(internalTimer.getFormatTime() + "   " + taskDescription );
+							adjustSize(countdown);
 						}
 					}
 					if (Activator.getDefault().isShowDialog()) {
@@ -249,6 +250,7 @@ public class Activator extends AbstractUIPlugin {
 						if (!countdown.isDisposed()) {
 							countdown.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
 							countdown.setText(sdf.format(new Date(timer.getConfigWorkTime())) + "   " + taskDescription );
+							adjustSize(countdown);
 						}
 					}
 					scheduleTimer(changeInterval);

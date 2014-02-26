@@ -19,6 +19,7 @@ public class PomodoroPreferencePage extends FieldEditorPreferencePage implements
 	public static final String DISCARD_OWN_MESSAGE="DISCARD_OWN_MESSAGE";
 	public static final String SHOW_TIMER_STATUS_BAR="SHOW_TIMER_STATUS_BAR";
 	public static final String FORCE_IPV4="FORCE_IPV4";
+	public static final String POMODORO_DESCRIPTION="POMODORO_DESCRIPTION";
 	public static final String BIND_IP_ADDR="BIND_IP_ADDR";
 
 	public PomodoroPreferencePage() {
@@ -35,6 +36,7 @@ public class PomodoroPreferencePage extends FieldEditorPreferencePage implements
 		addField(new BooleanFieldEditor(DISCARD_OWN_MESSAGE, "Discard own message in team table", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(SHOW_TIMER_STATUS_BAR, "Show timer in status bar", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(FORCE_IPV4, "Force IPv4", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(POMODORO_DESCRIPTION, "Set a Pomodoro description", getFieldEditorParent()));
 		addField(new StringFieldEditor(BIND_IP_ADDR, "Bind IP Address (optional):", getFieldEditorParent()));
 	}
 

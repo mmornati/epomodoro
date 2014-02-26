@@ -9,7 +9,7 @@
     <version>1.0.7-SNAPSHOT</version>
   </parent>
 
-  <artifactId>net.mornati.epomodoro_updatesite</artifactId>
+  <artifactId>net.mornati.epomodoro.updatesite</artifactId>
   <packaging>eclipse-repository</packaging>
   <!-- <packaging>eclipse-update-site</packaging> -->
 

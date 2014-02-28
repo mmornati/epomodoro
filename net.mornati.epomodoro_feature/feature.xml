@@ -2,7 +2,7 @@
 <feature
       id="net.mornati.epomodoro.feature"
       label="net.mornati.epomodoro"
-      version="1.0.7.qualifier"
+      version="1.0.8.qualifier"
       provider-name="mornati.net">
 
    <description url="https://marketplace.eclipse.org/content/epomodoro">

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/net.mornati.epomodoro.feature_1.0.7.qualifier.jar" id="net.mornati.epomodoro.feature" version="1.0.7.qualifier">
+   <feature url="features/net.mornati.epomodoro.feature_1.0.8.qualifier.jar" id="net.mornati.epomodoro.feature" version="1.0.8.qualifier">
       <category name="net.mornati.epomodoro"/>
    </feature>
    <category-def name="net.mornati.epomodoro" label="net.mornati.epomodoro">

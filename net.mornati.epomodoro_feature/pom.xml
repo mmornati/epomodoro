@@ -6,7 +6,7 @@
     <relativePath>../pom.xml</relativePath>
     <groupId>net.mornati</groupId>
     <artifactId>epomodoro</artifactId>
-    <version>1.0.7-SNAPSHOT</version>
+    <version>1.0.8-SNAPSHOT</version>
   </parent>
 
   <artifactId>net.mornati.epomodoro.feature</artifactId>

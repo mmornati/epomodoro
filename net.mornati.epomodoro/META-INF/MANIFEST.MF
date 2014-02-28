@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ePomodoro
 Bundle-SymbolicName: net.mornati.epomodoro;singleton:=true
-Bundle-Version: 1.0.7.qualifier
+Bundle-Version: 1.0.8.qualifier
 Bundle-Activator: net.mornati.epomodoro.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -10,5 +10,5 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
- lib/jgroups-3.1.0.Alpha3.jar
+ lib/jgroups-3.4.2.Final.jar
 Bundle-Vendor: mornati.net

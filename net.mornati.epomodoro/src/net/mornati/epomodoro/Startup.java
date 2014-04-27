@@ -10,8 +10,10 @@ import net.mornati.epomodoro.views.TeamStatus;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -89,7 +91,8 @@ public class Startup implements IStartup {
 							}
 						});
 						countdownStatus.setText(Activator.getDefault().getTimer().getFormatTime());
-						countdownStatus.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+						IPreferenceStore preferenceStore = Activator.getDefault().getPreferenceStore();
+						countdownStatus.setForeground(new Color(Display.getDefault(), StringConverter.asRGB(preferenceStore.getString(PomodoroPreferencePage.POMODORO_TIME_COLOR))));
 						Activator.getDefault().subscribeCounterLabel(countdownStatus);
 						GridData layoutData=new GridData(SWT.FILL, SWT.CENTER, false, true);
 						layoutData.widthHint=250;

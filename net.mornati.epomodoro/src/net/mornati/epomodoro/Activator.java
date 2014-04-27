@@ -26,8 +26,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
@@ -225,13 +227,14 @@ public class Activator extends AbstractUIPlugin {
 
 			@Override
 			public void run() {
+				IPreferenceStore preferenceStore=getPreferenceStore();
 				if (internalTimer != null) {
 					for (Label countdown : counterLabels) {
 						if (!countdown.isDisposed()) {
 							if (timer.getType() == PomodoroTimer.TYPE_WORK) {
-								countdown.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+								countdown.setForeground(new Color(Display.getDefault(), StringConverter.asRGB(preferenceStore.getString(PomodoroPreferencePage.POMODORO_TIME_COLOR))));
 							} else {
-								countdown.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
+								countdown.setForeground(new Color(Display.getDefault(), StringConverter.asRGB(preferenceStore.getString(PomodoroPreferencePage.POMODORO_PAUSE_COLOR))));
 							}
 							//							countdown.setToolTipText(timer.getType() == PomodoroTimer.TYPE_PAUSE ? "Pause Timer" : "Work Timer");
 							countdown.setText(internalTimer.getFormatTime() + "   " + taskDescription );
@@ -248,7 +251,7 @@ public class Activator extends AbstractUIPlugin {
 				} else {
 					for (Label countdown : counterLabels) {
 						if (!countdown.isDisposed()) {
-							countdown.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+							countdown.setForeground(new Color(Display.getDefault(), StringConverter.asRGB(preferenceStore.getString(PomodoroPreferencePage.POMODORO_TIME_COLOR))));
 							countdown.setText(sdf.format(new Date(timer.getConfigWorkTime())) + "   " + taskDescription );
 							adjustSize(countdown);
 						}

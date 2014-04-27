@@ -23,6 +23,8 @@ public class PomodoroPreferenceInitializer extends AbstractPreferenceInitializer
 		store.setDefault(PomodoroPreferencePage.FORCE_IPV4, true);
 		store.setDefault(PomodoroPreferencePage.POMODORO_DESCRIPTION, false);
 		store.setDefault(PomodoroPreferencePage.BIND_IP_ADDR, "");
+		store.setDefault(PomodoroPreferencePage.POMODORO_TIME_COLOR, "255, 0, 0" ); //RED
+		store.setDefault(PomodoroPreferencePage.POMODORO_PAUSE_COLOR, "0, 255, 0" ); //GREEN
 	}
 
 }

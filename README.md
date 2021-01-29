@@ -7,6 +7,7 @@ To install ePomodoro plugin you can download the project zip file (for example f
 The best and easy way in naturally using the update site (or the eclipse marketplace). All required operations will be accomplished automatically.
 
 ![Eclipse Marketplace][1]
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmmornati%2Fepomodoro.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmmornati%2Fepomodoro?ref=badge_shield)
 
 After the eclipse restart you should see the pomodoro timer in your status bar
 
@@ -105,3 +106,7 @@ work.
  [2]: http://res.cloudinary.com/blog-mornati-net/image/upload/v1391641408/ePomodoro5_xgchtw.png
  [3]: http://res.cloudinary.com/blog-mornati-net/image/upload/v1391641407/ePomodoro6_k8wsxk.png
  [4]: http://res.cloudinary.com/blog-mornati-net/image/upload/v1391641362/ePomodoro2_zqv9eo.png
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmmornati%2Fepomodoro.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmmornati%2Fepomodoro?ref=badge_large)
